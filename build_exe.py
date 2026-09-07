@@ -1,15 +1,32 @@
-"""One-click Windows executable build and packaging script for ResearchGuard."""
+"""One-click Windows executable build and packaging script for ResearchGuard.
+Compiles standalone Windows desktop application without requiring external Python runtime.
+"""
 
 import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
+
+
+def kill_running_instances():
+    """Terminates any running instances of ResearchGuard to prevent locked DLL errors."""
+    try:
+        subprocess.run(
+            ["powershell", "-Command", "Get-Process ResearchGuard -ErrorAction SilentlyContinue | Stop-Process -Force"],
+            capture_output=True,
+            timeout=5,
+        )
+        time.sleep(1)
+    except Exception:
+        pass
 
 
 def build_executable():
     print("==================================================")
     print("Building ResearchGuard Windows Executable (.EXE)")
+    print("SES's R. C. Patel IMRD Shirpur - Central Library")
     print("==================================================")
 
     root_dir = Path(__file__).resolve().parent
@@ -17,14 +34,22 @@ def build_executable():
     build_dir = root_dir / "build"
     spec_file = root_dir / "ResearchGuard.spec"
 
+    kill_running_instances()
+
     # Clean previous build artifacts if present
     if dist_dir.exists():
         print("Cleaning previous dist/ directory...")
-        shutil.rmtree(dist_dir, ignore_errors=True)
+        try:
+            shutil.rmtree(dist_dir, ignore_errors=True)
+        except Exception as e:
+            print(f"Warning cleaning dist: {e}")
 
     if build_dir.exists():
         print("Cleaning previous build/ directory...")
-        shutil.rmtree(build_dir, ignore_errors=True)
+        try:
+            shutil.rmtree(build_dir, ignore_errors=True)
+        except Exception as e:
+            print(f"Warning cleaning build: {e}")
 
     # Run PyInstaller
     cmd = [
@@ -39,7 +64,7 @@ def build_executable():
     result = subprocess.run(cmd, cwd=root_dir)
 
     if result.returncode != 0:
-        print("❌ Error: PyInstaller build failed!")
+        print("[ERROR] PyInstaller build failed with exit code: " + str(result.returncode))
         sys.exit(result.returncode)
 
     exe_path = dist_dir / "ResearchGuard" / "ResearchGuard.exe"
