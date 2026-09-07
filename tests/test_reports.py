@@ -70,6 +70,58 @@ def test_pdf_report_generation(tmp_path):
     assert res_path.stat().st_size > 1000
 
 
+def test_imrd_clearance_certificate_generation(tmp_path):
+    cert_out = tmp_path / "IMRD_Clearance_Certificate.pdf"
+    gen = PDFReportGenerator(cert_out)
+
+    doc_data = {
+        "filename": "mca_project_report.pdf",
+        "hash": "c0ffee1234567890abcdef1234567890c0ffee1234567890abcdef1234567890",
+        "word_count": 8500,
+        "page_count": 45,
+    }
+
+    score_dict = {
+        "overall_similarity": 7.8,  # Level 0 (<= 10.0%)
+        "risk_level": "Very Low",
+        "exact_percentage": 3.2,
+        "exact_count": 2,
+        "fuzzy_percentage": 2.6,
+        "fuzzy_count": 3,
+        "semantic_percentage": 2.0,
+        "semantic_count": 2,
+        "quoted_percentage": 5.0,
+        "quoted_count": 4,
+        "ignored_count": 0,
+    }
+
+    matches = [
+        {
+            "sentence": "The proposed system streamlines hospital outpatient admission workflows.",
+            "matched_text": "The system streamlines hospital outpatient registration workflows.",
+            "similarity_score": 88.0,
+            "algorithm": "Fuzzy Match",
+            "page_number": 12,
+            "source_name": "International Journal of Healthcare IT (2024)",
+        }
+    ]
+
+    meta = {
+        "student_name": "Patil Bhushan Dattatray",
+        "prn_number": "2024015400129876",
+        "course_name": "MCA",
+        "academic_year": "2025-2026",
+        "semester": "Semester IV",
+        "guide_name": "Dr. S. B. Patil",
+        "paper_title": "AI-Driven Hospital Management System",
+        "certificate_no": "IMRD/LIB/PLAG/2026/0042",
+    }
+
+    res_path = gen.generate_report(doc_data, score_dict, matches, {}, {}, metadata=meta)
+    assert res_path.exists()
+    assert res_path.stat().st_size > 2000
+
+
 def test_html_report_generation(tmp_path):
     html_out = tmp_path / "test_report.html"
     gen = HTMLReportGenerator(html_out)

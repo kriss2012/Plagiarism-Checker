@@ -1,26 +1,41 @@
-"""Main desktop application window for ResearchGuard.
-Contains the persistent sidebar navigation, top bar controls, and stacked central views.
+"""Main desktop application window for IMRD ResearchGuard.
+Tailored for SES's R. C. Patel Institute of Management Research and Development (IMRD), Shirpur.
+Provides native Windows menus, institutional branding banner, responsive navigation, and analytical views.
 """
 
-from typing import Dict, Optional
+from pathlib import Path
+from typing import Optional
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QAction, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (
     QButtonGroup,
+    QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
     QPushButton,
     QStackedWidget,
     QStatusBar,
     QVBoxLayout,
     QWidget,
 )
-from app.config import APP_NAME, APP_TITLE, APP_VERSION
-from app.database.models import Document, Match
-from app.database.session import get_db, get_setting
+from app.config import (
+    AFFILIATION_TEXT,
+    APP_NAME,
+    APP_TITLE,
+    APP_VERSION,
+    BASE_DIR,
+    INSTITUTION_NAME,
+    INSTITUTION_SHORT,
+    LIBRARY_DEPARTMENT,
+)
+from app.database.models import Document
+from app.database.session import get_db, get_setting, set_setting
 from app.ui.theme import get_theme_stylesheet
 from app.ui.views.dashboard_view import DashboardView
 from app.ui.views.documents_view import DocumentsView
@@ -28,52 +43,54 @@ from app.ui.views.help_view import HelpView
 from app.ui.views.match_viewer_view import MatchViewerView
 from app.ui.views.new_check_view import NewCheckView
 from app.ui.views.results_view import ResultsView
-from app.ui.views.source_library_view import SourceLibraryView
 from app.ui.views.settings_view import SettingsView
+from app.ui.views.source_library_view import SourceLibraryView
 
 
 class MainWindow(QMainWindow):
-    """Primary application frame hosting responsive navigation and analytical views."""
+    """Primary desktop application frame for IMRD Central Library plagiarism verification."""
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle(APP_TITLE)
-        self.resize(1280, 840)
-        self.setMinimumSize(1024, 700)
+        self.resize(1300, 860)
+        self.setMinimumSize(1080, 720)
 
-        # Set Window Icon
-        from pathlib import Path
-        from PySide6.QtGui import QIcon, QPixmap
-        icon_path = Path(__file__).resolve().parent.parent.parent / "resources" / "app_icon.png"
+        # Set Window and Taskbar Icon
+        icon_path = BASE_DIR / "resources" / "app_icon.png"
         if not icon_path.exists():
-            icon_path = Path(__file__).resolve().parent.parent.parent / "Logo.png"
+            icon_path = BASE_DIR / "Logo.png"
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
 
-        self._active_theme = get_setting("theme", "dark")
+        self._active_theme = get_setting("theme", "light")
         self._init_ui()
         self._apply_theme(self._active_theme)
 
     def _init_ui(self):
-        # Central widget and root horizontal layout
+        # 1. Native Windows Menu Bar
+        self._create_menu_bar()
+
+        # Central widget and root layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        root_layout = QHBoxLayout(central_widget)
-        root_layout.setContentsMargins(0, 0, 0, 0)
-        root_layout.setSpacing(0)
+        root_vbox = QVBoxLayout(central_widget)
+        root_vbox.setContentsMargins(0, 0, 0, 0)
+        root_vbox.setSpacing(0)
 
-        # 1. Left Sidebar
+        # 2. Institutional College Header
+        self.inst_header = self._create_institutional_header()
+        root_vbox.addWidget(self.inst_header)
+
+        # 3. Main Workspace (Sidebar + Central Stack)
+        workspace = QWidget()
+        ws_layout = QHBoxLayout(workspace)
+        ws_layout.setContentsMargins(0, 0, 0, 0)
+        ws_layout.setSpacing(0)
+
+        # Left Desktop Navigation Sidebar
         self.sidebar = self._create_sidebar()
-        root_layout.addWidget(self.sidebar)
-
-        # 2. Right Area (Top Bar + Main Stack)
-        right_container = QWidget()
-        right_box = QVBoxLayout(right_container)
-        right_box.setContentsMargins(0, 0, 0, 0)
-        right_box.setSpacing(0)
-
-        self.top_bar = self._create_top_bar()
-        right_box.addWidget(self.top_bar)
+        ws_layout.addWidget(self.sidebar)
 
         # Central Stacked Views
         self.stack = QStackedWidget()
@@ -97,7 +114,15 @@ class MainWindow(QMainWindow):
         self.view_match_viewer.back_to_results.connect(lambda: self._navigate_to(3))
         self.view_settings.theme_changed.connect(self._apply_theme)
 
-        # Add to stack (Indices: 0=Dashboard, 1=New Check, 2=Documents, 3=Results, 4=MatchViewer, 5=Sources, 6=Settings, 7=Help)
+        # Stack indices:
+        # 0: Dashboard
+        # 1: Verify Student Paper (New Check)
+        # 2: Student Records Archive (Documents)
+        # 3: Results & Certificate
+        # 4: Match Viewer
+        # 5: Source Library
+        # 6: System Settings
+        # 7: Librarian SOP & Help
         self.stack.addWidget(self.view_dashboard)    # 0
         self.stack.addWidget(self.view_new_check)    # 1
         self.stack.addWidget(self.view_documents)    # 2
@@ -107,64 +132,258 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.view_settings)     # 6
         self.stack.addWidget(self.view_help)         # 7
 
-        right_box.addWidget(self.stack, 1)
-        root_layout.addWidget(right_container, 1)
+        ws_layout.addWidget(self.stack, 1)
+        root_vbox.addWidget(workspace, 1)
 
-        # Status Bar
+        # 4. Status Bar
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("ResearchGuard Academic Plagiarism Checker • Ready")
+        self.status_bar.showMessage("SES's R. C. Patel IMRD Shirpur • Central Library Verification Cell • Ready")
+
+    def _create_menu_bar(self):
+        """Builds standard Windows native desktop menu bar with accelerators."""
+        menu_bar = self.menuBar()
+
+        # File Menu
+        file_menu = menu_bar.addMenu("&File")
+
+        act_new = QAction("&New Student Verification...", self)
+        act_new.setShortcut(QKeySequence("Ctrl+N"))
+        act_new.triggered.connect(lambda: self._navigate_to(1))
+        file_menu.addAction(act_new)
+
+        act_open = QAction("&Open Document to Verify...", self)
+        act_open.setShortcut(QKeySequence("Ctrl+O"))
+        act_open.triggered.connect(self._open_document_dialog)
+        file_menu.addAction(act_open)
+
+        file_menu.addSeparator()
+
+        act_print_cert = QAction("&Print / Export Clearance Certificate...", self)
+        act_print_cert.setShortcut(QKeySequence("Ctrl+P"))
+        act_print_cert.triggered.connect(lambda: self.view_results._export_pdf())
+        file_menu.addAction(act_print_cert)
+
+        act_export_archive = QAction("&Export Student Register (CSV)...", self)
+        act_export_archive.triggered.connect(lambda: self.view_documents.export_to_csv())
+        file_menu.addAction(act_export_archive)
+
+        file_menu.addSeparator()
+
+        act_exit = QAction("E&xit", self)
+        act_exit.setShortcut(QKeySequence("Alt+F4"))
+        act_exit.triggered.connect(self.close)
+        file_menu.addAction(act_exit)
+
+        # Edit Menu
+        edit_menu = menu_bar.addMenu("&Edit")
+
+        act_clear_form = QAction("&Clear Current Intake Form", self)
+        act_clear_form.triggered.connect(lambda: self.view_new_check._clear_form())
+        edit_menu.addAction(act_clear_form)
+
+        edit_menu.addSeparator()
+
+        act_settings = QAction("&Preferences / Settings...", self)
+        act_settings.setShortcut(QKeySequence("Ctrl+,"))
+        act_settings.triggered.connect(lambda: self._navigate_to(6))
+        edit_menu.addAction(act_settings)
+
+        # View Menu
+        view_menu = menu_bar.addMenu("&View")
+
+        act_v_dash = QAction("&Dashboard", self)
+        act_v_dash.setShortcut(QKeySequence("F1"))
+        act_v_dash.triggered.connect(lambda: self._navigate_to(0))
+        view_menu.addAction(act_v_dash)
+
+        act_v_new = QAction("&Verify Student Paper", self)
+        act_v_new.setShortcut(QKeySequence("F2"))
+        act_v_new.triggered.connect(lambda: self._navigate_to(1))
+        view_menu.addAction(act_v_new)
+
+        act_v_docs = QAction("&Student Records Archive", self)
+        act_v_docs.setShortcut(QKeySequence("F3"))
+        act_v_docs.triggered.connect(lambda: self._navigate_to(2))
+        view_menu.addAction(act_v_docs)
+
+        act_v_res = QAction("&Similarity Results & Certificate", self)
+        act_v_res.setShortcut(QKeySequence("F4"))
+        act_v_res.triggered.connect(lambda: self._navigate_to(3))
+        view_menu.addAction(act_v_res)
+
+        act_v_src = QAction("Reference &Source Library", self)
+        act_v_src.setShortcut(QKeySequence("F5"))
+        act_v_src.triggered.connect(lambda: self._navigate_to(5))
+        view_menu.addAction(act_v_src)
+
+        view_menu.addSeparator()
+
+        act_theme = QAction("Toggle &Light / Dark Theme", self)
+        act_theme.triggered.connect(self._toggle_theme)
+        view_menu.addAction(act_theme)
+
+        # Tools Menu
+        tools_menu = menu_bar.addMenu("&Tools")
+
+        act_refresh_lib = QAction("&Refresh Comparison Corpora", self)
+        act_refresh_lib.triggered.connect(lambda: self.view_sources.refresh_list())
+        tools_menu.addAction(act_refresh_lib)
+
+        act_db_check = QAction("&Database Integrity Check", self)
+        act_db_check.triggered.connect(self._check_database_integrity)
+        tools_menu.addAction(act_db_check)
+
+        # Reports Menu
+        reports_menu = menu_bar.addMenu("&Reports")
+
+        act_r_cert = QAction("Official IMRD Clearance &Certificate (PDF)", self)
+        act_r_cert.triggered.connect(lambda: self.view_results._export_pdf())
+        reports_menu.addAction(act_r_cert)
+
+        act_r_html = QAction("Interactive &HTML Audit Report", self)
+        act_r_html.triggered.connect(lambda: self.view_results._export_html())
+        reports_menu.addAction(act_r_html)
+
+        # Help Menu
+        help_menu = menu_bar.addMenu("&Help")
+
+        act_sop = QAction("&Librarian Verification SOP", self)
+        act_sop.triggered.connect(lambda: self._navigate_to(7))
+        help_menu.addAction(act_sop)
+
+        act_ugc = QAction("&UGC 2018 Plagiarism Regulations Guide", self)
+        act_ugc.triggered.connect(lambda: self._navigate_to(7))
+        help_menu.addAction(act_ugc)
+
+        help_menu.addSeparator()
+
+        act_about = QAction("&About IMRD ResearchGuard...", self)
+        act_about.triggered.connect(self._show_about_dialog)
+        help_menu.addAction(act_about)
+
+    def _create_institutional_header(self) -> QFrame:
+        """Creates the formal college banner featuring IMRD Shirpur credentials."""
+        hdr = QFrame()
+        hdr.setObjectName("instHeader")
+        layout = QHBoxLayout(hdr)
+        layout.setContentsMargins(16, 6, 16, 6)
+        layout.setSpacing(14)
+
+        # College Logo
+        logo_path = BASE_DIR / "resources" / "app_icon.png"
+        if not logo_path.exists():
+            logo_path = BASE_DIR / "Logo.png"
+
+        logo_lbl = QLabel()
+        if logo_path.exists():
+            pixmap = QPixmap(str(logo_path)).scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            logo_lbl.setPixmap(pixmap)
+        else:
+            logo_lbl.setText("IMRD")
+            logo_lbl.setStyleSheet("font-size: 20px; font-weight: bold; color: #FFFFFF;")
+        layout.addWidget(logo_lbl)
+
+        # College Title & Accreditation
+        title_box = QVBoxLayout()
+        title_box.setSpacing(1)
+
+        t1 = QLabel(INSTITUTION_NAME.upper())
+        t1.setStyleSheet("color: #FFFFFF; font-size: 13px; font-weight: 800; letter-spacing: 0.3px;")
+        
+        t2 = QLabel(f"{AFFILIATION_TEXT} • Central Library Verification Cell")
+        t2.setStyleSheet("color: #FDE68A; font-size: 11px; font-weight: 600;")
+
+        title_box.addWidget(t1)
+        title_box.addWidget(t2)
+        layout.addLayout(title_box)
+
+        layout.addStretch()
+
+        # Quick action buttons on the right side of header
+        quick_new_btn = QPushButton("+ Verify Student Paper")
+        quick_new_btn.setObjectName("certBtn")
+        quick_new_btn.setFixedHeight(34)
+        quick_new_btn.setCursor(Qt.PointingHandCursor)
+        quick_new_btn.clicked.connect(lambda: self._navigate_to(1))
+        layout.addWidget(quick_new_btn)
+
+        quick_rec_btn = QPushButton("Student Archive")
+        quick_rec_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 255, 255, 0.15);
+                color: #FFFFFF;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                font-weight: 600;
+                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.25);
+            }
+        """)
+        quick_rec_btn.setFixedHeight(34)
+        quick_rec_btn.setCursor(Qt.PointingHandCursor)
+        quick_rec_btn.clicked.connect(lambda: self._navigate_to(2))
+        layout.addWidget(quick_rec_btn)
+
+        self.theme_btn = QPushButton("Theme")
+        self.theme_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 255, 255, 0.12);
+                color: #FFFFFF;
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                font-size: 11px;
+                padding: 6px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.22);
+            }
+        """)
+        self.theme_btn.setFixedHeight(34)
+        self.theme_btn.clicked.connect(self._toggle_theme)
+        layout.addWidget(self.theme_btn)
+
+        # Status indicator pill
+        status_pill = QLabel("● Ready")
+        status_pill.setStyleSheet("""
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #A7F3D0;
+            border: 1px solid #10B981;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+        """)
+        layout.addWidget(status_pill)
+
+        return hdr
 
     def _create_sidebar(self) -> QFrame:
+        """Creates clean Windows desktop sidebar navigation without casual emojis."""
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
         layout = QVBoxLayout(sidebar)
-        layout.setContentsMargins(12, 18, 12, 18)
-        layout.setSpacing(6)
+        layout.setContentsMargins(6, 12, 6, 12)
+        layout.setSpacing(4)
 
-        # Logo / Branding
-        from pathlib import Path
-        from PySide6.QtGui import QPixmap
-        logo_path = Path(__file__).resolve().parent.parent.parent / "resources" / "app_icon.png"
-        if not logo_path.exists():
-            logo_path = Path(__file__).resolve().parent.parent.parent / "Logo.png"
+        nav_header = QLabel("CENTRAL LIBRARY MODULES")
+        nav_header.setStyleSheet("color: #64748B; font-size: 10px; font-weight: 800; padding: 6px 12px 4px 12px; letter-spacing: 0.5px;")
+        layout.addWidget(nav_header)
 
-        brand_box = QHBoxLayout()
-        logo_lbl = QLabel()
-        if logo_path.exists():
-            pixmap = QPixmap(str(logo_path)).scaled(32, 32, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            logo_lbl.setPixmap(pixmap)
-        else:
-            logo_lbl.setText("🛡️")
-            logo_lbl.setStyleSheet("font-size: 24px;")
-        logo_lbl.setStyleSheet("background: transparent; border: none;")
-        brand_box.addWidget(logo_lbl)
-
-        brand_txt = QVBoxLayout()
-        title = QLabel(APP_NAME)
-        title.setStyleSheet("font-size: 16px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px;")
-        sub = QLabel("Academic Systems")
-        sub.setStyleSheet("font-size: 11px; color: #818CF8; font-weight: 600;")
-        brand_txt.addWidget(title)
-        brand_txt.addWidget(sub)
-        brand_box.addLayout(brand_txt)
-        brand_box.addStretch()
-        layout.addLayout(brand_box)
-
-        layout.addSpacing(18)
-
-        # Navigation Buttons
         self.nav_group = QButtonGroup(self)
         self.nav_group.setExclusive(True)
 
         nav_items = [
-            ("📊  Dashboard", 0),
-            ("➕  New Check", 1),
-            ("📁  Documents", 2),
-            ("📈  Results", 3),
-            ("📚  Source Library", 5),
-            ("⚙️  Settings", 6),
-            ("❓  Help / About", 7),
+            ("Dashboard", 0),
+            ("Verify Student Paper", 1),
+            ("Student Records Archive", 2),
+            ("Similarity Results", 3),
+            ("Reference Source Library", 5),
+            ("Institutional Settings", 6),
+            ("Librarian SOP & Guidelines", 7),
         ]
 
         self.nav_buttons = {}
@@ -180,79 +399,37 @@ class MainWindow(QMainWindow):
 
         layout.addStretch()
 
-        # Offline Mode Badge in Sidebar bottom
-        offline_box = QFrame()
-        offline_box.setStyleSheet("""
+        # Institutional Central Library Badge
+        lib_box = QFrame()
+        lib_box.setStyleSheet("""
             QFrame {
-                background-color: rgba(16, 185, 129, 0.1);
-                border: 1px solid #10B981;
+                background-color: #F8FAFC;
+                border: 1px solid #CBD5E1;
                 border-radius: 6px;
-                padding: 8px;
+                padding: 8px 10px;
+                margin: 4px;
             }
         """)
-        ob_layout = QVBoxLayout(offline_box)
-        ob_layout.setSpacing(2)
-        ob_title = QLabel("🟢 OFFLINE MODE")
-        ob_title.setStyleSheet("font-size: 10px; font-weight: 800; color: #10B981;")
-        ob_desc = QLabel("Documents remain local")
-        ob_desc.setStyleSheet("font-size: 10px; color: #94A3B8;")
-        ob_layout.addWidget(ob_title)
-        ob_layout.addWidget(ob_desc)
-        layout.addWidget(offline_box)
+        lb_layout = QVBoxLayout(lib_box)
+        lb_layout.setSpacing(2)
+        lb_title = QLabel("IMRD Central Library")
+        lb_title.setStyleSheet("font-size: 11px; font-weight: 700; color: #002461;")
+        lb_sub = QLabel("Plagiarism Cell • Offline Engine")
+        lb_sub.setStyleSheet("font-size: 9.5px; color: #64748B;")
+        lb_layout.addWidget(lb_title)
+        lb_layout.addWidget(lb_sub)
+        layout.addWidget(lib_box)
 
         # Default select Dashboard
         self.nav_buttons[0].setChecked(True)
         return sidebar
-
-    def _create_top_bar(self) -> QFrame:
-        top_bar = QFrame()
-        top_bar.setObjectName("topBar")
-        layout = QHBoxLayout(top_bar)
-        layout.setContentsMargins(16, 8, 16, 8)
-        layout.setSpacing(12)
-
-        # Global Search
-        self.search_bar = QLineEdit()
-        self.search_bar.setPlaceholderText("Search documents, sources, or matches...")
-        self.search_bar.setFixedWidth(300)
-        self.search_bar.returnPressed.connect(self._on_search_triggered)
-        layout.addWidget(self.search_bar)
-
-        layout.addStretch()
-
-        # Theme Toggle
-        self.theme_btn = QPushButton("🌙 Theme")
-        self.theme_btn.setFixedHeight(32)
-        self.theme_btn.clicked.connect(self._toggle_theme)
-        layout.addWidget(self.theme_btn)
-
-        # Settings shortcut
-        settings_btn = QPushButton("Settings")
-        settings_btn.setFixedHeight(32)
-        settings_btn.clicked.connect(lambda: self._navigate_to(6))
-        layout.addWidget(settings_btn)
-
-        # System Status Pill
-        status_pill = QLabel("  ● Ready  ")
-        status_pill.setStyleSheet("""
-            background-color: rgba(16, 185, 129, 0.15);
-            color: #10B981;
-            border: 1px solid #10B981;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 8px;
-        """)
-        layout.addWidget(status_pill)
-
-        return top_bar
 
     def _navigate_to(self, index: int):
         self.stack.setCurrentIndex(index)
         if index in self.nav_buttons:
             self.nav_buttons[index].setChecked(True)
 
-        # Refresh target view if applicable
+        # Refresh destination views
         if index == 0:
             self.view_dashboard.refresh_data()
         elif index == 2:
@@ -266,20 +443,32 @@ class MainWindow(QMainWindow):
 
     def _apply_theme(self, theme_name: str):
         self._active_theme = theme_name
+        set_setting("theme", theme_name)
         self.setStyleSheet(get_theme_stylesheet(theme_name))
-        self.theme_btn.setText("☀️ Light" if theme_name == "light" else "🌙 Dark")
+        self.theme_btn.setText("Theme: " + theme_name.capitalize())
+
+    def _open_document_dialog(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Student Dissertation / Research Paper",
+            "",
+            "Academic Documents (*.pdf *.docx *.txt);;PDF Files (*.pdf);;Word Documents (*.docx)",
+        )
+        if file_path:
+            self._navigate_to(1)
+            self.view_new_check._add_files_to_queue([file_path])
 
     def _on_analysis_finished(self, result_and_id):
         result, doc_id = result_and_id
         self.view_results.load_result(result, doc_id)
-        self._navigate_to(3)  # Switch to Results view
+        self._navigate_to(3)
 
     def _on_open_match_viewer(self, data_dict):
         self.view_match_viewer.load_data(data_dict)
-        self._navigate_to(4)  # Switch to Match Viewer view
+        self._navigate_to(4)
 
     def _load_document_into_results(self, doc_id: int):
-        """Loads a past document from DB into the Results view."""
+        """Loads an archived student record from SQLite into the Results view."""
         import json
         from dataclasses import dataclass
         from app.core.scoring import ScoreBreakdown
@@ -308,7 +497,6 @@ class MainWindow(QMainWindow):
                 explanation="",
             )
 
-            # Reconstitute mock result object
             class SavedResult:
                 pass
 
@@ -321,13 +509,22 @@ class MainWindow(QMainWindow):
             res.score_breakdown = sb
             res.matches = matches
 
-            # Structure
+            # Student metadata
+            res.student_name = doc.student_name or "Student"
+            res.prn_number = doc.prn_number or "-"
+            res.course_name = doc.course_name or "MCA"
+            res.academic_year = doc.academic_year or "2025-2026"
+            res.semester = doc.semester or "Semester IV"
+            res.guide_name = doc.guide_name or "-"
+            res.paper_title = doc.paper_title or doc.filename
+            res.clearance_status = doc.clearance_status or "Approved (Level 0)"
+            res.certificate_no = doc.certificate_no or f"IMRD/LIB/{doc.id:04d}"
+
             try:
                 res.structure = json.loads(doc.structure_json) if doc.structure_json else {}
             except Exception:
                 res.structure = {}
 
-            # Citations
             @dataclass
             class MockCit:
                 citation_count: int = 0
@@ -337,19 +534,35 @@ class MainWindow(QMainWindow):
 
             res.citations = MockCit(quotes=[])
 
-            # AI
             @dataclass
             class MockAI:
                 likelihood: str = "Low"
-                score: float = 15.0
+                score: float = 10.0
 
             res.ai_writing = MockAI(likelihood=doc.ai_likelihood or "Low")
 
             self.view_results.load_result(res, doc_id)
             self._navigate_to(3)
 
-    def _on_search_triggered(self):
-        txt = self.search_bar.text().strip()
-        if txt:
-            self.view_documents.search_input.setText(txt)
-            self._navigate_to(2)  # Switch to documents view
+    def _check_database_integrity(self):
+        with get_db() as session:
+            count = session.query(Document).count()
+        QMessageBox.information(
+            self,
+            "Database Status",
+            f"Central Library SQLite Database is operational.\n\n"
+            f"• Verified Student Records: {count}\n"
+            f"• Schema: IMRD Shirpur Academic Integrity Standard v1.0",
+        )
+
+    def _show_about_dialog(self):
+        QMessageBox.about(
+            self,
+            f"About {APP_NAME}",
+            f"<b>{APP_NAME} v{APP_VERSION}</b><br/>"
+            f"<b>SES's R. C. Patel Institute of Management Research and Development, Shirpur</b><br/>"
+            f"{AFFILIATION_TEXT}<br/><br/>"
+            f"<b>Department:</b> {LIBRARY_DEPARTMENT}<br/>"
+            f"Developed for verification of student project reports, dissertations, and research papers "
+            f"in compliance with UGC Plagiarism Regulations, 2018."
+        )

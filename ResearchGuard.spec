@@ -6,6 +6,7 @@ block_cipher = None
 
 added_files = [
     ('resources', 'resources'),
+    ('Logo.png', '.'),
 ]
 
 hidden_imports = [

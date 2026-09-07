@@ -45,12 +45,12 @@ class MatchViewerView(QWidget):
         top_bar.addWidget(self.back_btn)
 
         self.title_lbl = QLabel("Interactive Match Inspector")
-        self.title_lbl.setStyleSheet("font-size: 16px; font-weight: 700; color: #FFFFFF;")
+        self.title_lbl.setStyleSheet("font-size: 16px; font-weight: 700; color: #002461;")
         top_bar.addWidget(self.title_lbl)
         top_bar.addStretch()
 
         self.match_counter_lbl = QLabel("Match 0 of 0")
-        self.match_counter_lbl.setStyleSheet("color: #94A3B8; font-weight: 600;")
+        self.match_counter_lbl.setStyleSheet("color: #475569; font-weight: 600;")
         top_bar.addWidget(self.match_counter_lbl)
 
         self.prev_btn = QPushButton("◀ Previous")
@@ -70,8 +70,8 @@ class MatchViewerView(QWidget):
         left_container = QWidget()
         l_box = QVBoxLayout(left_container)
         l_box.setContentsMargins(0, 0, 0, 0)
-        l_lbl = QLabel("ORIGINAL RESEARCH PAPER (HIGHLIGHTED)")
-        l_lbl.setStyleSheet("font-size: 11px; font-weight: 700; color: #94A3B8;")
+        l_lbl = QLabel("ORIGINAL STUDENT DISSERTATION (HIGHLIGHTED)")
+        l_lbl.setStyleSheet("font-size: 11px; font-weight: 700; color: #002461;")
         l_box.addWidget(l_lbl)
 
         self.highlight_editor = HighlightEditorWidget()
@@ -83,8 +83,8 @@ class MatchViewerView(QWidget):
         right_container = QWidget()
         r_box = QVBoxLayout(right_container)
         r_box.setContentsMargins(0, 0, 0, 0)
-        r_lbl = QLabel("MATCHED COMPARISON SOURCE")
-        r_lbl.setStyleSheet("font-size: 11px; font-weight: 700; color: #94A3B8;")
+        r_lbl = QLabel("MATCHED COMPARISON REPOSITORY SOURCE")
+        r_lbl.setStyleSheet("font-size: 11px; font-weight: 700; color: #002461;")
         r_box.addWidget(r_lbl)
 
         self.inspector_card = QFrame()
@@ -95,27 +95,27 @@ class MatchViewerView(QWidget):
         # Top Inspector Header
         ins_hdr = QHBoxLayout()
         self.ins_id_lbl = QLabel("MATCH #--")
-        self.ins_id_lbl.setStyleSheet("font-size: 18px; font-weight: 800; color: #818CF8;")
+        self.ins_id_lbl.setStyleSheet("font-size: 18px; font-weight: 800; color: #005FEA;")
         ins_hdr.addWidget(self.ins_id_lbl)
         ins_hdr.addStretch()
 
         self.ins_sim_lbl = QLabel("Similarity: --%")
-        self.ins_sim_lbl.setStyleSheet("font-size: 15px; font-weight: 700; color: #EF4444;")
+        self.ins_sim_lbl.setStyleSheet("font-size: 15px; font-weight: 700; color: #DC2626;")
         ins_hdr.addWidget(self.ins_sim_lbl)
         ins_layout.addLayout(ins_hdr)
 
         self.ins_algo_lbl = QLabel("Algorithm: -")
-        self.ins_algo_lbl.setStyleSheet("color: #94A3B8; font-size: 12px;")
+        self.ins_algo_lbl.setStyleSheet("color: #475569; font-size: 12px;")
         ins_layout.addWidget(self.ins_algo_lbl)
 
         self.ins_page_lbl = QLabel("Page: -")
-        self.ins_page_lbl.setStyleSheet("color: #94A3B8; font-size: 12px;")
+        self.ins_page_lbl.setStyleSheet("color: #475569; font-size: 12px;")
         ins_layout.addWidget(self.ins_page_lbl)
 
         # Source Title / Origin
         ins_layout.addWidget(QLabel("Matched Source:"))
         self.ins_source_title = QLabel("Source Name")
-        self.ins_source_title.setStyleSheet("color: #FFFFFF; font-weight: 700; font-size: 14px;")
+        self.ins_source_title.setStyleSheet("color: #002461; font-weight: 700; font-size: 14px;")
         self.ins_source_title.setWordWrap(True)
         ins_layout.addWidget(self.ins_source_title)
 
@@ -124,9 +124,9 @@ class MatchViewerView(QWidget):
         self.ins_source_text = QTextEdit()
         self.ins_source_text.setReadOnly(True)
         self.ins_source_text.setStyleSheet("""
-            background-color: #0B0F19;
-            color: #F8FAFC;
-            border: 1px solid #334155;
+            background-color: #FFFFFF;
+            color: #0F172A;
+            border: 1px solid #CBD5E1;
             border-radius: 6px;
             font-size: 13px;
         """)

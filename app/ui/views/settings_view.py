@@ -39,10 +39,10 @@ class SettingsView(QWidget):
 
         # Header
         h_box = QVBoxLayout()
-        title = QLabel("System Settings & Heuristics Configuration")
-        title.setStyleSheet("font-size: 22px; font-weight: 800; color: #FFFFFF;")
-        sub = QLabel("Customize similarity detection sensitivity, reporting templates, and privacy policies")
-        sub.setStyleSheet("font-size: 13px; color: #94A3B8;")
+        title = QLabel("Institutional Settings & System Configuration")
+        title.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        sub = QLabel("Customize IMRD Shirpur Central Library verification thresholds, UGC compliance policies, and templates")
+        sub.setStyleSheet("font-size: 12px; color: #64748B;")
         h_box.addWidget(title)
         h_box.addWidget(sub)
         layout.addLayout(h_box)

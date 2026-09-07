@@ -1,4 +1,4 @@
-"""Drag and drop file upload target widget for research papers."""
+"""Drag and drop file upload target widget for student papers and dissertations."""
 
 from pathlib import Path
 from typing import List
@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 
 
 class FileDropWidget(QFrame):
-    """Modern drag & drop zone for uploading PDF, DOCX, and TXT files."""
+    """Clean desktop drag & drop zone for uploading student PDF, DOCX, and TXT files."""
 
     files_selected = Signal(list)  # Emits list of file paths (List[str])
 
@@ -23,55 +23,50 @@ class FileDropWidget(QFrame):
         super().__init__(parent)
         self.setAcceptDrops(True)
         self.setFrameShape(QFrame.StyledPanel)
-        self.setMinimumHeight(170)
+        self.setMinimumHeight(140)
         self._init_ui()
 
     def _init_ui(self):
         self.setStyleSheet("""
             QFrame {
-                background-color: rgba(30, 41, 59, 0.5);
-                border: 2px dashed #475569;
-                border-radius: 12px;
+                background-color: #F8FAFC;
+                border: 2px dashed #CBD5E1;
+                border-radius: 8px;
             }
             QFrame:hover {
-                border-color: #6366F1;
-                background-color: rgba(99, 102, 241, 0.05);
+                border-color: #005FEA;
+                background-color: #EFF6FF;
             }
         """)
 
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(10)
+        layout.setSpacing(6)
 
-        # Upload icon / text
-        self.icon_label = QLabel("📄")
-        self.icon_label.setStyleSheet("font-size: 32px; background: transparent; border: none;")
-        self.icon_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.icon_label)
-
-        self.main_text = QLabel("Drag & drop research papers here")
-        self.main_text.setStyleSheet("font-size: 15px; font-weight: 600; color: #F8FAFC; background: transparent; border: none;")
+        self.main_text = QLabel("Drag & Drop Student Dissertation or Research Paper Here")
+        self.main_text.setStyleSheet("font-size: 13.5px; font-weight: 700; color: #002461; background: transparent; border: none;")
         self.main_text.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.main_text)
 
-        self.sub_text = QLabel("Supported formats: PDF, Word (DOCX), Plain Text (TXT) • Up to 50MB")
-        self.sub_text.setStyleSheet("font-size: 12px; color: #94A3B8; background: transparent; border: none;")
+        self.sub_text = QLabel("Supported formats: PDF (.pdf), Microsoft Word (.docx), Plain Text (.txt)")
+        self.sub_text.setStyleSheet("font-size: 11px; color: #64748B; background: transparent; border: none;")
         self.sub_text.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.sub_text)
 
         # Browse button
         self.browse_btn = QPushButton("Browse Files...")
         self.browse_btn.setObjectName("primaryBtn")
-        self.browse_btn.setFixedWidth(150)
+        self.browse_btn.setFixedWidth(140)
+        self.browse_btn.setCursor(Qt.PointingHandCursor)
         self.browse_btn.clicked.connect(self._open_file_dialog)
         layout.addWidget(self.browse_btn, alignment=Qt.AlignCenter)
 
     def _open_file_dialog(self):
         files, _ = QFileDialog.getOpenFileNames(
             self,
-            "Select Research Papers for Plagiarism Analysis",
+            "Select Student Dissertation / Research Paper",
             "",
-            "Academic Documents (*.pdf *.docx *.doc *.txt);;PDF Documents (*.pdf);;Word Documents (*.docx);;Text Files (*.txt);;All Files (*.*)",
+            "Academic Documents (*.pdf *.docx *.txt);;PDF Documents (*.pdf);;Word Documents (*.docx);;Text Files (*.txt);;All Files (*.*)",
         )
         if files:
             self.files_selected.emit(files)
@@ -81,9 +76,9 @@ class FileDropWidget(QFrame):
             event.acceptProposedAction()
             self.setStyleSheet("""
                 QFrame {
-                    background-color: rgba(99, 102, 241, 0.15);
-                    border: 2px dashed #818CF8;
-                    border-radius: 12px;
+                    background-color: #EFF6FF;
+                    border: 2px dashed #005FEA;
+                    border-radius: 8px;
                 }
             """)
         else:

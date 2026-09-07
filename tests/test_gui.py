@@ -35,6 +35,21 @@ def test_main_window_instantiation(qapp):
     window._toggle_theme()
     assert window._active_theme in ["light", "dark"]
     window._toggle_theme()
-    assert window._active_theme in ["light", "dark"]
+    # Test student intake form in NewCheckView
+    new_check = window.view_new_check
+    new_check.input_student_name.setText("Test Student")
+    new_check.input_prn.setText("2024015400999999")
+    new_check.input_guide.setText("Dr. S. B. Patil")
+    new_check.input_title.setText("Automated Library Plagiarism Verification")
+    assert new_check.input_student_name.text() == "Test Student"
+
+    # Test clearing form
+    new_check._clear_form()
+    assert new_check.input_student_name.text() == ""
+
+    # Test DocumentsView filter
+    doc_view = window.view_documents
+    doc_view.refresh_list()
+    assert doc_view.table.columnCount() == 9
 
     window.close()
