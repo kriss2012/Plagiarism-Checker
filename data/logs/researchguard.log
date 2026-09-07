@@ -1,0 +1,39 @@
+2026-09-07 17:43:13 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:43:13 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-07 17:43:13 [INFO] (ResearchGuard) Starting plagiarism analysis for: suspicious_paper.txt
+2026-09-07 17:43:13 [INFO] (ResearchGuard) Comparing 21 document sentences against 8 source sentences.
+2026-09-07 17:43:22 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:43:22 [INFO] (ResearchGuard) Starting plagiarism analysis for: sample_source.txt
+2026-09-07 17:43:22 [INFO] (ResearchGuard) Comparing 22 document sentences against 8 source sentences.
+2026-09-07 17:43:22 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:43:22 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-07 17:43:22 [INFO] (ResearchGuard) Generating PDF report at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_pdf_report_generation0\test_report.pdf
+2026-09-07 17:43:22 [INFO] (ResearchGuard) ReportLab successfully generated PDF report: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_pdf_report_generation0\test_report.pdf
+2026-09-07 17:44:00 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:44:00 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-07 17:44:00 [INFO] (ResearchGuard) Starting plagiarism analysis for: suspicious_paper.txt
+2026-09-07 17:44:00 [INFO] (ResearchGuard) Comparing 21 document sentences against 16 source sentences.
+2026-09-07 17:44:02 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:44:02 [INFO] (ResearchGuard) Starting plagiarism analysis for: sample_source.txt
+2026-09-07 17:44:02 [INFO] (ResearchGuard) Comparing 22 document sentences against 16 source sentences.
+2026-09-07 17:44:02 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:44:02 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-07 17:44:02 [INFO] (ResearchGuard) Generating PDF report at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_pdf_report_generation0\test_report.pdf
+2026-09-07 17:44:02 [INFO] (ResearchGuard) ReportLab successfully generated PDF report: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_pdf_report_generation0\test_report.pdf
+2026-09-07 17:45:19 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:45:19 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-07 17:45:19 [INFO] (ResearchGuard) Starting plagiarism analysis for: suspicious_paper.txt
+2026-09-07 17:45:19 [INFO] (ResearchGuard) Comparing 21 document sentences against 16 source sentences.
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Starting plagiarism analysis for: sample_source.txt
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Comparing 22 document sentences against 16 source sentences.
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Extracting content from: test_sample.pdf (.pdf)
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Extracting content from: test_sample.docx (.docx)
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-07 17:45:21 [INFO] (ResearchGuard) Generating PDF report at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-2\test_pdf_report_generation0\test_report.pdf
+2026-09-07 17:45:21 [INFO] (ResearchGuard) ReportLab successfully generated PDF report: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-2\test_pdf_report_generation0\test_report.pdf
+2026-09-07 17:46:40 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-07 17:46:40 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-07 17:51:08 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-07 17:51:08 [INFO] (ResearchGuard) Database initialized successfully.
