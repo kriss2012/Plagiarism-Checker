@@ -11,13 +11,14 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 from app.config import ACADEMIC_DISCLAIMER, REPORTS_DIR
 from app.reports.html_generator import HTMLReportGenerator
 from app.reports.pdf_generator import PDFReportGenerator
-from app.ui.widgets.cards import MetricCard, RiskBadge
+from app.ui.widgets.cards import EmptyStateWidget, MetricCard, RiskBadge
 from app.ui.widgets.charts import SimilarityGaugeWidget
 from app.utils.logger import logger
 
@@ -26,6 +27,7 @@ class ResultsView(QWidget):
     """Presents verification results, UGC compliance tier, and prints the official clearance certificate."""
 
     open_match_viewer = Signal(dict)
+    start_check_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -34,6 +36,24 @@ class ResultsView(QWidget):
         self._init_ui()
 
     def _init_ui(self):
+        outer_layout = QVBoxLayout(self)
+        outer_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.stack = QStackedWidget(self)
+
+        # Page 0: Empty State
+        empty_container = QWidget()
+        empty_layout = QVBoxLayout(empty_container)
+        empty_layout.setContentsMargins(24, 40, 24, 40)
+        self.empty_state = EmptyStateWidget(
+            title="No Active Verification Results",
+            message="No dissertation verification has been conducted in this session. Select an archived student paper from 'Student Records Archive' or verify a new draft in 'Verify Student Paper'.",
+            parent=empty_container,
+        )
+        empty_layout.addWidget(self.empty_state)
+        self.stack.addWidget(empty_container)
+
+        # Page 1: Results Content Scroll Area
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -49,10 +69,10 @@ class ResultsView(QWidget):
         v_title.setSpacing(2)
 
         self.title_lbl = QLabel("Student Dissertation Plagiarism Verification & Clearance")
-        self.title_lbl.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        self.title_lbl.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
         
         self.student_bar_lbl = QLabel("Student: - • PRN: - • Program: -")
-        self.student_bar_lbl.setStyleSheet("font-size: 12px; font-weight: 600; color: #005FEA;")
+        self.student_bar_lbl.setStyleSheet("font-size: 11.5px; font-weight: 600; color: #005FEA;")
         
         self.file_lbl = QLabel("Document: - • Words: 0 • Pages: 0")
         self.file_lbl.setStyleSheet("font-size: 11px; color: #64748B;")
@@ -60,26 +80,26 @@ class ResultsView(QWidget):
         v_title.addWidget(self.title_lbl)
         v_title.addWidget(self.student_bar_lbl)
         v_title.addWidget(self.file_lbl)
-        h_layout.addLayout(v_title)
-        h_layout.addStretch()
+        h_layout.addLayout(v_title, 1)
 
         # Action Buttons
-        self.export_cert_btn = QPushButton("🖨️ Print IMRD Clearance Certificate (PDF)")
+        self.export_cert_btn = QPushButton("Print Clearance Certificate (PDF)")
         self.export_cert_btn.setObjectName("certBtn")
-        self.export_cert_btn.setMinimumHeight(38)
+        self.export_cert_btn.setFixedHeight(34)
         self.export_cert_btn.setCursor(Qt.PointingHandCursor)
         self.export_cert_btn.clicked.connect(self._export_pdf)
         h_layout.addWidget(self.export_cert_btn)
 
         self.inspect_btn = QPushButton("Inspect Matches")
         self.inspect_btn.setObjectName("primaryBtn")
-        self.inspect_btn.setMinimumHeight(38)
+        self.inspect_btn.setFixedHeight(34)
         self.inspect_btn.setCursor(Qt.PointingHandCursor)
         self.inspect_btn.clicked.connect(self._on_inspect_clicked)
         h_layout.addWidget(self.inspect_btn)
 
-        self.export_html_btn = QPushButton("HTML Audit")
-        self.export_html_btn.setMinimumHeight(38)
+        self.export_html_btn = QPushButton("HTML Audit Report")
+        self.export_html_btn.setFixedHeight(34)
+        self.export_html_btn.setCursor(Qt.PointingHandCursor)
         self.export_html_btn.clicked.connect(self._export_html)
         h_layout.addWidget(self.export_html_btn)
 
@@ -138,16 +158,19 @@ class ResultsView(QWidget):
         metrics_col = QVBoxLayout()
         metrics_col.setSpacing(8)
 
+        self.card_exact = MetricCard("Exact Overlap", "0", "Direct identical phrasing", "#EF4444")
+        self.card_fuzzy = MetricCard("Paraphrased / Fuzzy", "0", "High lexical similarity", "#F59E0B")
+        self.card_semantic = MetricCard("Semantic Proximity", "0", "Topical / concept match", "#8B5CF6")
+        self.card_quoted = MetricCard("Quoted / Cited", "0", "Legitimate academic quotes", "#0284C7")
+
         row1 = QHBoxLayout()
-        self.card_exact = MetricCard("Exact Text Matches", "0", "0.0% overlap", "#DC2626")
-        self.card_fuzzy = MetricCard("Fuzzy Modifications", "0", "0.0% overlap", "#D97706")
+        row1.setSpacing(8)
         row1.addWidget(self.card_exact)
         row1.addWidget(self.card_fuzzy)
         metrics_col.addLayout(row1)
 
         row2 = QHBoxLayout()
-        self.card_semantic = MetricCard("Semantic Paraphrases", "0", "0.0% index", "#005FEA")
-        self.card_quoted = MetricCard("Quoted & Cited Passages", "0", "Excluded (UGC Sec 6.1)", "#10B981")
+        row2.setSpacing(8)
         row2.addWidget(self.card_semantic)
         row2.addWidget(self.card_quoted)
         metrics_col.addLayout(row2)
@@ -155,47 +178,55 @@ class ResultsView(QWidget):
         top_grid.addLayout(metrics_col, 2)
         layout.addLayout(top_grid)
 
-        # 4. Structure & Citations Analysis
-        sub_grid = QHBoxLayout()
-        sub_grid.setSpacing(14)
+        # 4. Details Split: Paper Structure vs Citations & AI Heuristics
+        details_row = QHBoxLayout()
+        details_row.setSpacing(14)
 
+        # Structure Parser Card
         struct_card = QFrame()
         struct_card.setObjectName("card")
-        s_box = QVBoxLayout(struct_card)
-        s_hdr = QLabel("DISSERTATION CHAPTER & STRUCTURE VERIFICATION")
-        s_hdr.setStyleSheet("color: #002461; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
-        s_box.addWidget(s_hdr)
-        self.structure_text = QLabel("Analyzing sections...")
-        self.structure_text.setStyleSheet("color: #334155; font-size: 11.5px; line-height: 1.5;")
+        sb_layout = QVBoxLayout(struct_card)
+        sb_layout.setSpacing(6)
+        sb_title = QLabel("DISSERTATION STRUCTURE RECOGNITION")
+        sb_title.setStyleSheet("color: #002461; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
+        sb_layout.addWidget(sb_title)
+        self.structure_text = QLabel("Analyzing document structure...")
+        self.structure_text.setStyleSheet("font-size: 12px; color: #334155; line-height: 1.4;")
         self.structure_text.setWordWrap(True)
-        s_box.addWidget(self.structure_text)
-        sub_grid.addWidget(struct_card, 1)
+        sb_layout.addWidget(self.structure_text)
+        details_row.addWidget(struct_card, 1)
 
+        # Citations & Stylometrics Card
         cit_card = QFrame()
         cit_card.setObjectName("card")
-        c_box = QVBoxLayout(cit_card)
-        c_hdr = QLabel("CITATIONS & ACADEMIC INTEGRITY INDICATORS")
-        c_hdr.setStyleSheet("color: #002461; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
-        c_box.addWidget(c_hdr)
-        self.citations_text = QLabel("Calculating citation metrics...")
-        self.citations_text.setStyleSheet("color: #334155; font-size: 11.5px; line-height: 1.5;")
+        cb_layout = QVBoxLayout(cit_card)
+        cb_layout.setSpacing(6)
+        cb_title = QLabel("CITATIONS, REFERENCES & STYLOMETRIC HEURISTICS")
+        cb_title.setStyleSheet("color: #002461; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
+        cb_layout.addWidget(cb_title)
+        self.citations_text = QLabel("Auditing citation density...")
+        self.citations_text.setStyleSheet("font-size: 12px; color: #334155; line-height: 1.4;")
         self.citations_text.setWordWrap(True)
-        c_box.addWidget(self.citations_text)
-        sub_grid.addWidget(cit_card, 1)
+        cb_layout.addWidget(self.citations_text)
+        details_row.addWidget(cit_card, 1)
 
-        layout.addLayout(sub_grid)
+        layout.addLayout(details_row)
 
-        # 5. Institutional Disclaimer Notice
+        # 5. Institutional Academic Disclaimer Banner
         disc_frame = QFrame()
         disc_frame.setStyleSheet("""
             QFrame {
                 background-color: #F8FAFC;
                 border: 1px solid #CBD5E1;
                 border-radius: 6px;
-                padding: 8px 12px;
+                padding: 10px 14px;
             }
         """)
-        disc_layout = QHBoxLayout(disc_frame)
+        disc_layout = QVBoxLayout(disc_frame)
+        disc_layout.setSpacing(2)
+        disc_title = QLabel("INSTITUTIONAL PLAGIARISM CLEARANCE DISCLAIMER")
+        disc_title.setStyleSheet("font-size: 10px; font-weight: 800; color: #002461; letter-spacing: 0.5px;")
+        disc_layout.addWidget(disc_title)
         disc_text = QLabel(
             f"<b>SES's R. C. Patel IMRD Shirpur Central Library:</b> {ACADEMIC_DISCLAIMER}"
         )
@@ -205,14 +236,16 @@ class ResultsView(QWidget):
         layout.addWidget(disc_frame)
 
         scroll.setWidget(container)
-        outer_layout = QVBoxLayout(self)
-        outer_layout.setContentsMargins(0, 0, 0, 0)
-        outer_layout.addWidget(scroll)
+        self.stack.addWidget(scroll)
+
+        outer_layout.addWidget(self.stack)
+        self.stack.setCurrentIndex(0)
 
     def load_result(self, result_obj, doc_id: Optional[int] = None):
         """Populates the view with completed student verification results."""
         self._current_result = result_obj
         self._doc_id = doc_id
+        self.stack.setCurrentIndex(1)
 
         # Update Student Header Bar
         student_name = getattr(result_obj, "student_name", "Student Name")

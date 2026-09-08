@@ -149,6 +149,9 @@ class AddSourceDialog(QDialog):
         self.accept()
 
 
+from app.ui.widgets.cards import EmptyStateWidget
+
+
 class SourceLibraryView(QWidget):
     """View presenting repository of reference books, journals, and previous publications."""
 
@@ -159,24 +162,25 @@ class SourceLibraryView(QWidget):
 
     def _init_ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.setSpacing(16)
+        layout.setContentsMargins(20, 18, 20, 20)
+        layout.setSpacing(14)
 
         # Header
         h_box = QHBoxLayout()
         v_title = QVBoxLayout()
+        v_title.setSpacing(2)
         title = QLabel("Central Library Reference Source Repository")
-        title.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        title.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
         sub = QLabel("Institutional repository of academic journals, textbooks, syllabus materials, and past dissertations")
-        sub.setStyleSheet("font-size: 12px; color: #64748B;")
+        sub.setStyleSheet("font-size: 11.5px; color: #64748B;")
         v_title.addWidget(title)
         v_title.addWidget(sub)
-        h_box.addLayout(v_title)
-        h_box.addStretch()
+        h_box.addLayout(v_title, 1)
 
         add_btn = QPushButton("+ Add Reference Source")
         add_btn.setObjectName("primaryBtn")
-        add_btn.setMinimumHeight(38)
+        add_btn.setFixedHeight(34)
+        add_btn.setCursor(Qt.PointingHandCursor)
         add_btn.clicked.connect(self._open_add_dialog)
         h_box.addWidget(add_btn)
 
@@ -191,29 +195,50 @@ class SourceLibraryView(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         for i in range(1, 6):
             self.table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Fixed)
+        self.table.setColumnWidth(6, 90)
+        self.table.horizontalHeader().setMinimumSectionSize(75)
         self.table.verticalHeader().setVisible(False)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         layout.addWidget(self.table)
+
+        # Empty State
+        self.empty_state = EmptyStateWidget(
+            title="No Reference Sources in Library",
+            message="Add reference textbooks, academic journals, syllabus guides, or past student dissertations to expand the institutional comparison corpus.",
+            action_text="+ Add First Reference Source",
+            action_callback=self._open_add_dialog,
+        )
+        self.empty_state.setVisible(False)
+        layout.addWidget(self.empty_state)
 
     def refresh_list(self):
         """Loads and updates table with sources from database."""
         try:
             sources = get_all_sources()
-            self.table.setRowCount(len(sources))
-            for r_idx, s in enumerate(sources):
-                self.table.setItem(r_idx, 0, QTableWidgetItem(s.title))
-                self.table.setItem(r_idx, 1, QTableWidgetItem(s.author or "Unknown"))
-                self.table.setItem(r_idx, 2, QTableWidgetItem(str(s.publication_year or "-")))
-                self.table.setItem(r_idx, 3, QTableWidgetItem(s.source_type or "Journal"))
-                self.table.setItem(r_idx, 4, QTableWidgetItem(f"{s.word_count:,}"))
-                self.table.setItem(r_idx, 5, QTableWidgetItem(s.created_at.strftime("%Y-%m-%d") if s.created_at else "-"))
+            if not sources:
+                self.table.setVisible(False)
+                self.empty_state.setVisible(True)
+            else:
+                self.table.setVisible(True)
+                self.empty_state.setVisible(False)
+                self.table.setRowCount(len(sources))
+                for r_idx, s in enumerate(sources):
+                    self.table.setItem(r_idx, 0, QTableWidgetItem(s.title))
+                    self.table.setItem(r_idx, 1, QTableWidgetItem(s.author or "Unknown"))
+                    self.table.setItem(r_idx, 2, QTableWidgetItem(str(s.publication_year or "-")))
+                    self.table.setItem(r_idx, 3, QTableWidgetItem(s.source_type or "Journal"))
+                    self.table.setItem(r_idx, 4, QTableWidgetItem(f"{s.word_count:,}"))
+                    self.table.setItem(r_idx, 5, QTableWidgetItem(s.created_at.strftime("%Y-%m-%d") if s.created_at else "-"))
 
-                del_btn = QPushButton("Delete")
-                del_btn.setFixedHeight(24)
-                del_btn.setStyleSheet("color: #F87171; border-color: #7F1D1D;")
-                del_btn.clicked.connect(lambda chk=False, s_id=s.id: self._delete_source(s_id))
-                self.table.setCellWidget(r_idx, 6, del_btn)
-        except Exception as e:
+                    del_btn = QPushButton("Delete")
+                    del_btn.setObjectName("dangerBtn")
+                    del_btn.setFixedHeight(24)
+                    del_btn.setStyleSheet("font-size: 11px; padding: 2px 8px;")
+                    del_btn.setCursor(Qt.PointingHandCursor)
+                    del_btn.clicked.connect(lambda chk=False, s_id=s.id: self._delete_source(s_id))
+                    self.table.setCellWidget(r_idx, 6, del_btn)
+        except Exception:
             pass
 
     def _open_add_dialog(self):

@@ -34,15 +34,17 @@ class SettingsView(QWidget):
 
     def _init_ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.setSpacing(16)
+        layout.setContentsMargins(20, 18, 20, 20)
+        layout.setSpacing(14)
 
         # Header
         h_box = QVBoxLayout()
+        v_title = QVBoxLayout()
+        v_title.setSpacing(2)
         title = QLabel("Institutional Settings & System Configuration")
-        title.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        title.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
         sub = QLabel("Customize IMRD Shirpur Central Library verification thresholds, UGC compliance policies, and templates")
-        sub.setStyleSheet("font-size: 12px; color: #64748B;")
+        sub.setStyleSheet("font-size: 11.5px; color: #64748B;")
         h_box.addWidget(title)
         h_box.addWidget(sub)
         layout.addLayout(h_box)
@@ -53,11 +55,11 @@ class SettingsView(QWidget):
         # ================= TAB 1: GENERAL =================
         tab_gen = QWidget()
         form_gen = QFormLayout(tab_gen)
-        form_gen.setContentsMargins(20, 20, 20, 20)
+        form_gen.setContentsMargins(18, 18, 18, 18)
         form_gen.setSpacing(14)
 
         self.theme_combo = QComboBox()
-        self.theme_combo.addItems(["Dark Mode", "Light Mode"])
+        self.theme_combo.addItems(["Light Mode", "Dark Mode"])
         form_gen.addRow("UI Appearance Theme:", self.theme_combo)
 
         self.chk_auto_save = QCheckBox("Automatically archive generated reports")
@@ -71,7 +73,7 @@ class SettingsView(QWidget):
         # ================= TAB 2: ANALYSIS THRESHOLDS =================
         tab_ana = QWidget()
         form_ana = QFormLayout(tab_ana)
-        form_ana.setContentsMargins(20, 20, 20, 20)
+        form_ana.setContentsMargins(18, 18, 18, 18)
         form_ana.setSpacing(14)
 
         self.spin_fuzzy_thresh = QDoubleSpinBox()
@@ -98,7 +100,7 @@ class SettingsView(QWidget):
         # ================= TAB 3: DOCUMENTS & EXTRACTION =================
         tab_doc = QWidget()
         form_doc = QFormLayout(tab_doc)
-        form_doc.setContentsMargins(20, 20, 20, 20)
+        form_doc.setContentsMargins(18, 18, 18, 18)
         form_doc.setSpacing(14)
 
         self.spin_max_file_size = QSpinBox()
@@ -120,7 +122,7 @@ class SettingsView(QWidget):
         # ================= TAB 4: REPORTS & INSTITUTION =================
         tab_rep = QWidget()
         form_rep = QFormLayout(tab_rep)
-        form_rep.setContentsMargins(20, 20, 20, 20)
+        form_rep.setContentsMargins(18, 18, 18, 18)
         form_rep.setSpacing(14)
 
         self.inst_name_input = QLineEdit()
@@ -140,27 +142,27 @@ class SettingsView(QWidget):
         # ================= TAB 5: PRIVACY & NETWORK =================
         tab_priv = QWidget()
         v_priv = QVBoxLayout(tab_priv)
-        v_priv.setContentsMargins(20, 20, 20, 20)
+        v_priv.setContentsMargins(18, 18, 18, 18)
         v_priv.setSpacing(14)
 
         priv_banner = QFrame()
         priv_banner.setStyleSheet("""
             QFrame {
-                background-color: rgba(16, 185, 129, 0.1);
+                background-color: rgba(16, 185, 129, 0.08);
                 border: 1px solid #10B981;
-                border-radius: 8px;
+                border-radius: 6px;
                 padding: 12px;
             }
         """)
         pb_box = QVBoxLayout(priv_banner)
-        pb_title = QLabel("🔒 OFFLINE-FIRST PRIVACY GUARANTEE")
-        pb_title.setStyleSheet("font-weight: 800; color: #10B981; font-size: 14px;")
+        pb_title = QLabel("OFFLINE-FIRST PRIVACY GUARANTEE")
+        pb_title.setStyleSheet("font-weight: 800; color: #047857; font-size: 13px;")
         pb_desc = QLabel(
             "Your research papers are analyzed entirely on this local workstation. "
             "No document content is uploaded to external clouds, commercial third-party LLMs, "
             "or unauthorized indexing engines."
         )
-        pb_desc.setStyleSheet("color: #E2E8F0; font-size: 12px;")
+        pb_desc.setStyleSheet("color: #334155; font-size: 11.5px;")
         pb_desc.setWordWrap(True)
         pb_box.addWidget(pb_title)
         pb_box.addWidget(pb_desc)
@@ -171,7 +173,7 @@ class SettingsView(QWidget):
         form_priv.addRow("Network Access:", self.chk_offline_mode)
 
         db_path_lbl = QLabel(str(DATABASE_PATH))
-        db_path_lbl.setStyleSheet("color: #94A3B8; font-family: monospace; font-size: 11px;")
+        db_path_lbl.setStyleSheet("color: #64748B; font-family: monospace; font-size: 11px;")
         form_priv.addRow("Local Database File:", db_path_lbl)
         v_priv.addLayout(form_priv)
         v_priv.addStretch()
@@ -186,8 +188,9 @@ class SettingsView(QWidget):
 
         self.save_btn = QPushButton("Save Settings")
         self.save_btn.setObjectName("primaryBtn")
-        self.save_btn.setMinimumHeight(38)
-        self.save_btn.setMinimumWidth(140)
+        self.save_btn.setFixedHeight(34)
+        self.save_btn.setMinimumWidth(130)
+        self.save_btn.setCursor(Qt.PointingHandCursor)
         self.save_btn.clicked.connect(self.save_settings)
         btn_box.addWidget(self.save_btn)
 
@@ -198,8 +201,8 @@ class SettingsView(QWidget):
         settings = get_all_settings()
 
         # General
-        th = settings.get("theme", "dark")
-        self.theme_combo.setCurrentIndex(0 if th == "dark" else 1)
+        th = settings.get("theme", "light")
+        self.theme_combo.setCurrentIndex(0 if th == "light" else 1)
         self.chk_auto_save.setChecked(bool(settings.get("auto_save_reports", True)))
         self.chk_confirm_del.setChecked(bool(settings.get("confirm_deletion", True)))
 
