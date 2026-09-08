@@ -163,69 +163,78 @@ class DocumentsView(QWidget):
 
             filtered.append(d)
 
-        self.table.setRowCount(len(filtered))
-        for r_idx, doc in enumerate(filtered):
-            cert_no = doc.get("certificate_no") or f"IMRD/LIB/{doc['id']:04d}"
-            self.table.setItem(r_idx, 0, QTableWidgetItem(cert_no))
-            self.table.setItem(r_idx, 1, QTableWidgetItem(doc.get("prn_number") or "-"))
-            
-            name_item = QTableWidgetItem(doc.get("student_name") or doc["filename"])
-            name_item.setToolTip(doc.get("paper_title") or doc["filename"])
-            self.table.setItem(r_idx, 2, name_item)
+        if not filtered:
+            self.table.setVisible(False)
+            self.empty_state.setVisible(True)
+        else:
+            self.table.setVisible(True)
+            self.empty_state.setVisible(False)
+            self.table.setRowCount(len(filtered))
+            for r_idx, doc in enumerate(filtered):
+                cert_no = doc.get("certificate_no") or f"IMRD/LIB/{doc['id']:04d}"
+                self.table.setItem(r_idx, 0, QTableWidgetItem(cert_no))
+                self.table.setItem(r_idx, 1, QTableWidgetItem(doc.get("prn_number") or "-"))
+                
+                name_item = QTableWidgetItem(doc.get("student_name") or doc["filename"])
+                name_item.setToolTip(doc.get("paper_title") or doc["filename"])
+                self.table.setItem(r_idx, 2, name_item)
 
-            self.table.setItem(r_idx, 3, QTableWidgetItem(doc.get("course_name") or "MCA"))
-            self.table.setItem(r_idx, 4, QTableWidgetItem(doc.get("guide_name") or "-"))
-            self.table.setItem(r_idx, 5, QTableWidgetItem(doc["upload_date"][:10]))
+                self.table.setItem(r_idx, 3, QTableWidgetItem(doc.get("course_name") or "MCA"))
+                self.table.setItem(r_idx, 4, QTableWidgetItem(doc.get("guide_name") or "-"))
+                self.table.setItem(r_idx, 5, QTableWidgetItem(doc["upload_date"][:10]))
 
-            sim_val = doc.get("overall_similarity", 0.0)
-            sim_item = QTableWidgetItem(f"{sim_val:.1f}%")
-            sim_item.setTextAlignment(Qt.AlignCenter)
-            self.table.setItem(r_idx, 6, sim_item)
+                sim_val = doc.get("overall_similarity", 0.0)
+                sim_item = QTableWidgetItem(f"{sim_val:.1f}%")
+                sim_item.setTextAlignment(Qt.AlignCenter)
+                self.table.setItem(r_idx, 6, sim_item)
 
-            # UGC Clearance Badge
-            status_str = doc.get("clearance_status") or ("Approved (Level 0)" if sim_val <= 10.0 else "Revisions Required (Level 1)")
-            badge = QLabel(status_str)
-            badge.setAlignment(Qt.AlignCenter)
-            if "Approved" in status_str or sim_val <= 10.0:
-                bg, fg, border = "#ECFDF5", "#047857", "#10B981"
-            elif "Revisions Required" in status_str:
-                bg, fg, border = "#FFFBEB", "#B45309", "#F59E0B"
-            elif "Major" in status_str:
-                bg, fg, border = "#FEF2F2", "#B91C1C", "#EF4444"
-            else:
-                bg, fg, border = "#450A0A", "#FFFFFF", "#991B1B"
+                # UGC Clearance Badge
+                status_str = doc.get("clearance_status") or ("Approved (Level 0)" if sim_val <= 10.0 else "Revisions Required (Level 1)")
+                badge = QLabel(status_str)
+                badge.setAlignment(Qt.AlignCenter)
+                if "Approved" in status_str or sim_val <= 10.0:
+                    bg, fg, border = "#ECFDF5", "#047857", "#10B981"
+                elif "Revisions Required" in status_str:
+                    bg, fg, border = "#FFFBEB", "#B45309", "#F59E0B"
+                elif "Major" in status_str:
+                    bg, fg, border = "#FEF2F2", "#B91C1C", "#EF4444"
+                else:
+                    bg, fg, border = "#450A0A", "#FFFFFF", "#991B1B"
 
-            badge.setStyleSheet(f"""
-                background-color: {bg};
-                color: {fg};
-                border: 1px solid {border};
-                border-radius: 4px;
-                font-size: 10px;
-                font-weight: 700;
-                padding: 3px 6px;
-            """)
-            self.table.setCellWidget(r_idx, 7, badge)
+                badge.setStyleSheet(f"""
+                    background-color: {bg};
+                    color: {fg};
+                    border: 1px solid {border};
+                    border-radius: 4px;
+                    font-size: 10px;
+                    font-weight: 700;
+                    padding: 3px 6px;
+                """)
+                self.table.setCellWidget(r_idx, 7, badge)
 
-            # Actions cell
-            btn_box = QWidget()
-            b_layout = QHBoxLayout(btn_box)
-            b_layout.setContentsMargins(2, 2, 2, 2)
-            b_layout.setSpacing(4)
+                # Actions cell
+                btn_box = QWidget()
+                b_layout = QHBoxLayout(btn_box)
+                b_layout.setContentsMargins(2, 2, 2, 2)
+                b_layout.setSpacing(6)
 
-            view_btn = QPushButton("Certificate")
-            view_btn.setObjectName("certBtn")
-            view_btn.setFixedHeight(24)
-            view_btn.setStyleSheet("padding: 2px 8px; font-size: 11px;")
-            view_btn.clicked.connect(lambda chk=False, d_id=doc["id"]: self.view_doc_requested.emit(d_id))
-            b_layout.addWidget(view_btn)
+                view_btn = QPushButton("Certificate")
+                view_btn.setObjectName("certBtn")
+                view_btn.setFixedHeight(24)
+                view_btn.setStyleSheet("padding: 2px 8px; font-size: 11px;")
+                view_btn.setCursor(Qt.PointingHandCursor)
+                view_btn.clicked.connect(lambda chk=False, d_id=doc["id"]: self.view_doc_requested.emit(d_id))
+                b_layout.addWidget(view_btn)
 
-            del_btn = QPushButton("Delete")
-            del_btn.setFixedHeight(24)
-            del_btn.setStyleSheet("color: #DC2626; border-color: #FCA5A5; font-size: 11px; padding: 2px 6px;")
-            del_btn.clicked.connect(lambda chk=False, d_id=doc["id"]: self._delete_document(d_id))
-            b_layout.addWidget(del_btn)
+                del_btn = QPushButton("Delete")
+                del_btn.setObjectName("dangerBtn")
+                del_btn.setFixedHeight(24)
+                del_btn.setStyleSheet("font-size: 11px; padding: 2px 8px;")
+                del_btn.setCursor(Qt.PointingHandCursor)
+                del_btn.clicked.connect(lambda chk=False, d_id=doc["id"]: self._delete_document(d_id))
+                b_layout.addWidget(del_btn)
 
-            self.table.setCellWidget(r_idx, 8, btn_box)
+                self.table.setCellWidget(r_idx, 8, btn_box)
 
     def _delete_document(self, doc_id: int):
         confirm = QMessageBox.question(
