@@ -1,14 +1,16 @@
 """Application entry point for ResearchGuard desktop application.
 Initializes logging, SQLite database, Qt application lifecycle, and primary window.
+Shows an animated splash screen on launch with KiriGen Tech watermark.
 """
 
 import sys
 import traceback
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 from app.config import APP_TITLE
 from app.database.session import init_db
 from app.ui.main_window import MainWindow
+from app.ui.splash import AnimatedSplash
 from app.utils.logger import logger
 
 
@@ -44,7 +46,7 @@ def main():
 
     app = QApplication(sys.argv)
     app.setApplicationName("ResearchGuard")
-    app.setOrganizationName("Academic Systems")
+    app.setOrganizationName("IMRD Shirpur")
 
     # Set Application Icon
     from pathlib import Path
@@ -55,22 +57,44 @@ def main():
     if icon_path.exists():
         app.setWindowIcon(QIcon(str(icon_path)))
 
-    # Initialize SQLite database
+    # ── Animated Splash Screen ─────────────────────────────────────────
+    splash = AnimatedSplash()
+    splash.show()
+    app.processEvents()  # ensure splash paints before blocking DB init
+
+    # Initialise DB while splash is visible (runs synchronously but
+    # the splash animation is timer-driven so it continues to paint).
+    db_error = None
     try:
         init_db()
+        logger.info("Database initialised successfully.")
     except Exception as e:
         logger.error(f"Database initialization failure: {e}", exc_info=True)
-        QMessageBox.critical(None, "Database Error", f"Failed to initialize local database:\n{e}")
-        return 1
+        db_error = e
 
-    # Instantiate and display primary window
-    try:
-        window = MainWindow()
-        window.show()
-    except Exception as e:
-        logger.error(f"Failed to show main window: {e}", exc_info=True)
-        QMessageBox.critical(None, "Startup Error", f"Could not launch application window:\n{e}")
-        return 1
+    # Keep a reference; created now, shown only after splash closes
+    window_holder = {}
+
+    def _launch_main():
+        """Called when the splash animation finishes."""
+        if db_error:
+            QMessageBox.critical(
+                None, "Database Error",
+                f"Failed to initialize local database:\n{db_error}"
+            )
+            app.quit()
+            return
+
+        try:
+            window = MainWindow()
+            window_holder["w"] = window   # keep reference alive
+            window.show()
+        except Exception as e:
+            logger.error(f"Failed to show main window: {e}", exc_info=True)
+            QMessageBox.critical(None, "Startup Error", f"Could not launch application window:\n{e}")
+            app.quit()
+
+    splash.finished.connect(_launch_main)
 
     return app.exec()
 
