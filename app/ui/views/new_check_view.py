@@ -187,7 +187,8 @@ class NewCheckView(QWidget):
         for c in range(1, 6):
             self.queue_table.horizontalHeader().setSectionResizeMode(c, QHeaderView.ResizeToContents)
         self.queue_table.verticalHeader().setVisible(False)
-        self.queue_table.setFixedHeight(95)
+        self.queue_table.setMinimumHeight(95)
+        self.queue_table.setMaximumHeight(160)
         f_layout.addWidget(self.queue_table)
 
         layout.addWidget(file_card)
@@ -204,11 +205,11 @@ class NewCheckView(QWidget):
         excl_title.setStyleSheet("font-weight: 700; font-size: 11px; color: #002461;")
         excl_box.addWidget(excl_title)
 
-        self.chk_ex_refs = QCheckBox("Exclude References & Bibliography (Mandatory UGC Sec 6.1)")
+        self.chk_ex_refs = QCheckBox("Exclude References & Bibliography (UGC Sec 6.1)")
         self.chk_ex_refs.setChecked(True)
-        self.chk_ex_quotes = QCheckBox("Exclude Quoted & Cited Passages (Mandatory UGC Sec 6.1)")
+        self.chk_ex_quotes = QCheckBox("Exclude Quoted & Cited Passages (UGC Sec 6.1)")
         self.chk_ex_quotes.setChecked(True)
-        self.chk_ex_phrases = QCheckBox("Filter Common Clichés & Mathematical Formulae")
+        self.chk_ex_phrases = QCheckBox("Filter Common Clichés & Formulae")
         self.chk_ex_phrases.setChecked(True)
 
         excl_box.addWidget(self.chk_ex_refs)
@@ -222,9 +223,9 @@ class NewCheckView(QWidget):
         corp_title.setStyleSheet("font-weight: 700; font-size: 11px; color: #002461;")
         corp_box.addWidget(corp_title)
 
-        self.chk_local_lib = QCheckBox("Central Library Institutional Repository (Journals & Books)")
+        self.chk_local_lib = QCheckBox("Institutional Repository (Journals & Books)")
         self.chk_local_lib.setChecked(True)
-        self.chk_past_docs = QCheckBox("Previously Submitted Student Dissertations & Projects")
+        self.chk_past_docs = QCheckBox("Past Student Dissertations & Projects")
         self.chk_past_docs.setChecked(True)
 
         corp_box.addWidget(self.chk_local_lib)
@@ -264,19 +265,24 @@ class NewCheckView(QWidget):
 
         btn_row = QHBoxLayout()
         self.clear_btn = QPushButton("Clear Form")
+        self.clear_btn.setFixedHeight(34)
+        self.clear_btn.setCursor(Qt.PointingHandCursor)
         self.clear_btn.clicked.connect(self._clear_form)
         btn_row.addWidget(self.clear_btn)
 
         btn_row.addStretch()
 
         self.cancel_btn = QPushButton("Cancel Verification")
+        self.cancel_btn.setObjectName("dangerBtn")
+        self.cancel_btn.setFixedHeight(34)
+        self.cancel_btn.setCursor(Qt.PointingHandCursor)
         self.cancel_btn.setVisible(False)
         self.cancel_btn.clicked.connect(self._cancel_analysis)
         btn_row.addWidget(self.cancel_btn)
 
         self.analyze_btn = QPushButton("Verify Student Paper & Check UGC Compliance")
         self.analyze_btn.setObjectName("certBtn")
-        self.analyze_btn.setMinimumHeight(44)
+        self.analyze_btn.setFixedHeight(40)
         self.analyze_btn.setMinimumWidth(320)
         self.analyze_btn.setCursor(Qt.PointingHandCursor)
         self.analyze_btn.clicked.connect(self._start_analysis)
