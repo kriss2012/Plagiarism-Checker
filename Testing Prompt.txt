@@ -1,0 +1,1505 @@
+# IMRD ResearchGuard — Full UI/UX, Responsiveness, QA & Developer Fix Audit
+
+You are acting as a SENIOR SOFTWARE DEVELOPER + QA ENGINEER + UI/UX ENGINEER + RESPONSIVE DESIGN SPECIALIST.
+
+I want you to thoroughly inspect, test, debug, and improve the IMRD ResearchGuard application.
+
+The application is a Student Paper & Dissertation Plagiarism Checker / Central Library Verification system.
+
+Do NOT only look for functional bugs.
+
+You must aggressively test:
+
+- UI glitches
+- Layout problems
+- Responsiveness
+- Horizontal overflow
+- Vertical overflow
+- Clipped content
+- Incorrect spacing
+- Broken alignment
+- Table problems
+- Button problems
+- Form problems
+- Typography
+- Loading states
+- Empty states
+- Error states
+- Accessibility
+- Browser behavior
+- Data rendering
+- Functional bugs
+- Performance problems
+- Developer/code-quality problems
+
+The goal is to make the application look and behave like a polished professional institutional application.
+
+==================================================
+IMPORTANT: SCREENSHOT-BASED ISSUES ALREADY OBSERVED
+==================================================
+
+The provided screenshots show the following areas that MUST be investigated.
+
+Do not assume these are the only problems.
+
+Use them as starting points and look for additional problems throughout the application.
+
+--------------------------------------------------
+1. ARCHIVE TABLE HORIZONTAL CLIPPING
+--------------------------------------------------
+
+The Student Records Archive table appears to have content extending beyond the visible viewport.
+
+Observed symptoms include:
+
+- Certificate number appears partially cut off on the left.
+- Table content is wider than the available viewport.
+- The Actions column is partially clipped.
+- Action buttons appear to extend beyond the visible area.
+- Some table cells are compressed.
+- Columns do not appear to adapt properly to narrower widths.
+
+Investigate:
+
+- table width
+- parent container width
+- min-width
+- max-width
+- overflow-x
+- overflow-y
+- flexbox behavior
+- grid behavior
+- table-layout
+- column widths
+- padding
+- button widths
+- responsive breakpoints
+
+DO NOT simply hide the overflow.
+
+The information must remain accessible.
+
+Choose the correct solution based on the UI:
+
+- responsive table
+- horizontal table scrolling
+- responsive card/table transformation
+- controlled column sizing
+- wrapping
+- responsive Actions column
+- or a combination
+
+Never use:
+
+overflow: hidden
+
+as a quick fix if it causes users to lose information.
+
+--------------------------------------------------
+2. ACTION BUTTONS ARE CLIPPED
+--------------------------------------------------
+
+The Actions column appears to contain buttons that are partially outside the visible table/container.
+
+Check:
+
+- button width
+- button padding
+- button gap
+- flex wrapping
+- container width
+- table cell width
+- overflow
+- responsive behavior
+- minimum viewport widths
+
+Make sure all actions remain usable.
+
+Buttons must never be:
+
+- cut off
+- overlapping
+- outside the viewport
+- impossible to click
+- partially hidden
+
+On narrow screens, consider:
+
+- stacking buttons
+- using icon buttons with accessible labels
+- dropdown/action menu
+- wrapping actions
+- converting table rows into cards
+
+Do NOT sacrifice usability merely to keep the desktop table structure.
+
+--------------------------------------------------
+3. FILTER BAR RESPONSIVENESS
+--------------------------------------------------
+
+The archive page contains:
+
+- Search input
+- Program filter
+- UGC Status filter
+
+The screenshots suggest inconsistent spacing and large empty/background blocks around the filter controls.
+
+Investigate the filter layout carefully.
+
+Check for:
+
+- fixed widths
+- excessive width allocation
+- unnecessary empty columns
+- incorrect grid-template-columns
+- flex-basis problems
+- fixed heights
+- margin/padding problems
+- responsive wrapping
+- label alignment
+- input alignment
+- select width
+- placeholder visibility
+
+The filter controls should behave correctly at:
+
+320px
+375px
+390px
+414px
+480px
+768px
+820px
+1024px
+1280px
+1440px
+1920px
+
+Expected behavior:
+
+Desktop:
+Search, Program and UGC Status should have a clean horizontal layout.
+
+Tablet:
+Controls should resize or wrap naturally.
+
+Mobile:
+Controls should stack vertically or use a well-designed responsive layout.
+
+Nothing should overflow horizontally.
+
+--------------------------------------------------
+4. EXCESSIVE EMPTY SPACE
+--------------------------------------------------
+
+There are unusually large empty areas visible in the archive interface.
+
+Investigate whether these are caused by:
+
+- fixed heights
+- min-height
+- grid rows
+- empty placeholder components
+- incorrect flex alignment
+- skeleton loaders that remain visible
+- containers reserving unnecessary space
+- CSS height values
+- viewport calculations
+
+Do not simply reduce the height blindly.
+
+Determine why the space exists.
+
+The page should use space efficiently while maintaining visual breathing room.
+
+--------------------------------------------------
+5. POSSIBLE SKELETON / BACKGROUND BLOCK GLITCH
+--------------------------------------------------
+
+There are pale vertical rectangular areas around the filter controls.
+
+Investigate whether these are:
+
+- unintended backgrounds
+- skeleton loaders
+- empty elements
+- pseudo-elements
+- grid columns
+- separators
+- loading placeholders
+- incorrect CSS backgrounds
+
+If they are not intentional UI elements, remove/fix them.
+
+If they are loading states, make sure they disappear when loading completes.
+
+A completed page must never look like it is partially loading.
+
+--------------------------------------------------
+6. TABLE HEADER / BODY ALIGNMENT
+--------------------------------------------------
+
+Verify that:
+
+TABLE HEADER COLUMN
+matches
+TABLE BODY COLUMN
+
+Check:
+
+- widths
+- padding
+- borders
+- text alignment
+- vertical alignment
+- font sizes
+- line heights
+
+Pay special attention to:
+
+Cert. No.
+PRN / Roll No
+Student Name
+Program
+Supervisor
+Date
+Similarity
+UGC Clearance
+Actions
+
+The header and body must remain aligned at every supported viewport.
+
+--------------------------------------------------
+7. CERTIFICATE NUMBER TEXT
+--------------------------------------------------
+
+The certificate number is long.
+
+Test:
+
+D/LIB/PLAG/2026/0001
+
+Make sure long identifiers do not unexpectedly clip.
+
+Possible solutions:
+
+- wrapping
+- tooltip
+- controlled truncation with full value on hover
+- horizontal scrolling
+- responsive row/card layout
+
+Do not silently remove important characters.
+
+--------------------------------------------------
+8. UGC CLEARANCE COLUMN
+--------------------------------------------------
+
+The UGC Clearance value appears cramped/clipped.
+
+For example:
+
+Approved (Level 0)
+
+Check:
+
+- badge width
+- text wrapping
+- padding
+- minimum width
+- responsive behavior
+- accessibility
+
+The full status should remain understandable.
+
+Do not allow the badge text to be cut.
+
+--------------------------------------------------
+9. SEARCH INPUT
+--------------------------------------------------
+
+Test the search input extensively.
+
+Search by:
+
+- Student name
+- PRN
+- Roll number
+- Title
+- partial name
+- lowercase
+- uppercase
+- spaces
+- leading spaces
+- trailing spaces
+- special characters
+- Unicode
+- empty string
+- very long string
+
+Verify:
+
+- filtering works
+- clear behavior works
+- no layout shift occurs
+- input does not overflow
+- results update correctly
+- empty state is correct
+
+--------------------------------------------------
+10. EMPTY STATE
+--------------------------------------------------
+
+The archive shows:
+
+"No Student Verification Records Found"
+
+Verify whether this empty state is displayed correctly.
+
+Test:
+
+- genuinely empty database
+- search with no results
+- filter with no results
+- temporary loading
+- API failure
+- database failure
+
+Do NOT use the same message for:
+
+"No data exists"
+
+and
+
+"Something went wrong."
+
+These should be different states.
+
+For example:
+
+EMPTY:
+No student verification records found.
+
+NO SEARCH RESULTS:
+No records match your search/filter.
+
+ERROR:
+Unable to load student verification records. Please try again.
+
+--------------------------------------------------
+11. LOADING STATE
+--------------------------------------------------
+
+Test every page while data is loading.
+
+Check:
+
+- skeletons
+- spinners
+- disabled buttons
+- layout shifts
+- blank areas
+- loading text
+- duplicate requests
+
+Loading UI must not remain after data loads.
+
+No skeleton or placeholder should appear permanently.
+
+--------------------------------------------------
+12. ENGINE STATUS
+--------------------------------------------------
+
+The interface displays:
+
+"Verification Engine"
+"Ready"
+"Local NLP Model Active"
+
+and another area shows:
+
+"Engine Ready"
+
+Verify that these states are actually connected to the engine.
+
+Test:
+
+- engine ready
+- engine starting
+- engine unavailable
+- engine crashed
+- model unavailable
+- model loading
+- verification running
+- verification completed
+- verification failed
+
+Do not display "Ready" if the underlying engine is unavailable.
+
+The UI status must represent the actual backend/system state.
+
+--------------------------------------------------
+13. RESPONSIVE HEADER
+--------------------------------------------------
+
+Test the complete application header.
+
+Check:
+
+- institution name
+- logo
+- subtitle
+- engine status
+- navigation/menu
+- window resizing
+
+At small widths:
+
+Nothing should overlap.
+
+Institution branding should not collide with:
+
+"Engine Ready"
+
+If necessary, use:
+
+- responsive typography
+- wrapping
+- collapsing navigation
+- mobile menu
+- shortened secondary text
+
+--------------------------------------------------
+14. SIDEBAR RESPONSIVENESS
+--------------------------------------------------
+
+The left navigation contains:
+
+Dashboard
+Verify Student Paper
+Student Records Archive
+Similarity Results
+Reference Source Library
+Institutional Settings
+Librarian SOP Guidelines
+
+Test sidebar at:
+
+320px
+375px
+390px
+414px
+768px
+1024px
+1280px+
+
+On mobile, determine whether it should:
+
+- collapse
+- become a drawer
+- become a hamburger menu
+- become a compact navigation
+
+The current desktop sidebar must NOT simply remain full-width on a mobile screen.
+
+--------------------------------------------------
+15. CONTENT CONTAINER RESPONSIVENESS
+--------------------------------------------------
+
+Verify that all content containers behave correctly.
+
+Check:
+
+- max-width
+- width
+- padding
+- margin
+- border
+- radius
+- grid
+- flex
+- viewport width
+
+Test window resizing continuously:
+
+1920 → 1440 → 1280 → 1024 → 768 → 600 → 480 → 414 → 390 → 375 → 320
+
+There must be no:
+
+- horizontal scrollbar
+- clipped content
+- overlapping cards
+- disappearing controls
+- broken tables
+- overlapping text
+- off-screen buttons
+
+--------------------------------------------------
+16. PLAGIARISM RESULT PAGE
+--------------------------------------------------
+
+The plagiarism result screen must be thoroughly tested.
+
+Visible sections include:
+
+UGC Level 0: Cleared
+Overall Similarity Index
+Exact Overlap
+Paraphrased / Fuzzy
+Semantic Proximity
+Quoted / Cited
+Dissertation Structure Recognition
+Citations, References & Stylometric Heuristics
+Institutional Plagiarism Clearance Disclaimer
+
+Test all of these.
+
+--------------------------------------------------
+17. SIMILARITY GAUGE
+--------------------------------------------------
+
+Verify the gauge:
+
+0.0%
+SIMILARITY INDEX
+VERY LOW
+
+Test values:
+
+0%
+1%
+5%
+10%
+19.9%
+20%
+30%
+50%
+75%
+99%
+100%
+
+Check:
+
+- gauge rendering
+- labels
+- colors
+- thresholds
+- rounding
+- accessibility
+- responsive sizing
+
+Make sure the visual gauge agrees with the actual numeric value.
+
+--------------------------------------------------
+18. SIMILARITY CATEGORIES
+--------------------------------------------------
+
+Test:
+
+Exact Overlap
+Paraphrased / Fuzzy
+Semantic Proximity
+Quoted / Cited
+
+Verify that:
+
+- values are correct
+- percentages are correct
+- labels are correct
+- calculations are correct
+- colors are consistent
+- values add up logically where applicable
+
+Do not allow contradictory information.
+
+--------------------------------------------------
+19. DISSERTATION STRUCTURE RECOGNITION
+--------------------------------------------------
+
+The UI shows:
+
+Title: Not detected
+Abstract: Identified
+Keywords: Not detected
+Introduction: Identified
+Literature Review: Not detected
+Methodology: Not detected
+Results: Identified
+Discussion: Identified
+Conclusion: Identified
+References: Identified
+
+Test:
+
+- all sections detected
+- no sections detected
+- partially detected
+- unusual document structure
+- short document
+- long document
+- malformed document
+
+Check that "Not detected" is not incorrectly treated as an error if the document legitimately lacks the section.
+
+--------------------------------------------------
+20. CITATION / REFERENCE COUNTS
+--------------------------------------------------
+
+The result screen shows:
+
+In-Text Citations: 37 parsed
+References Count: 105 bibliographic entries
+Quoted Passages: 0 sections isolated
+Potentially Uncited Sections: 1 paragraphs
+
+Verify the grammar and pluralization.
+
+Examples:
+
+1 paragraph
+2 paragraphs
+
+1 reference
+2 references
+
+1 citation
+2 citations
+
+Avoid:
+
+"1 paragraphs"
+
+Also verify that counts are accurate.
+
+--------------------------------------------------
+21. AI WRITING LIKELIHOOD
+--------------------------------------------------
+
+The UI displays:
+
+AI Writing Likelihood: Medium (49%)
+
+Verify:
+
+- calculation
+- display
+- threshold
+- color
+- wording
+- confidence interpretation
+
+Do NOT present an AI likelihood score as definitive proof of AI authorship.
+
+Use appropriate explanatory wording if necessary.
+
+--------------------------------------------------
+22. TYPOGRAPHY
+--------------------------------------------------
+
+Perform a typography audit.
+
+Check:
+
+- font sizes
+- font weights
+- line heights
+- letter spacing
+- heading hierarchy
+- paragraph readability
+- button text
+- labels
+- badges
+- table text
+
+Look for:
+
+- text clipping
+- text wrapping
+- inconsistent font sizes
+- unreadable small text
+- excessive bold text
+- inconsistent capitalization
+
+--------------------------------------------------
+23. COLOR CONSISTENCY
+--------------------------------------------------
+
+Audit the color system.
+
+Ensure:
+
+- primary colors are consistent
+- success = consistent green
+- warning = consistent amber
+- error = consistent red
+- information = consistent blue
+- disabled states are distinguishable
+
+Do not use colors as the only indication of status.
+
+For example:
+
+UGC CLEARED
+
+should have both:
+
+- visual status
+- readable text/status label
+
+--------------------------------------------------
+24. ACCESSIBILITY
+--------------------------------------------------
+
+Perform an accessibility audit.
+
+Check:
+
+- keyboard navigation
+- tab order
+- visible focus
+- labels
+- ARIA
+- semantic HTML
+- screen reader labels
+- button accessibility
+- select accessibility
+- form errors
+- color contrast
+- table accessibility
+- modal accessibility
+
+Every icon-only action must have an accessible label.
+
+Every input must have an accessible name.
+
+--------------------------------------------------
+25. BUTTONS
+--------------------------------------------------
+
+Test every button.
+
+Check:
+
+- hover
+- focus
+- active
+- disabled
+- loading
+- double click
+- rapid click
+- keyboard activation
+
+Make sure buttons cannot accidentally trigger duplicate actions.
+
+For destructive actions:
+
+- require confirmation where appropriate
+- explain what will happen
+
+--------------------------------------------------
+26. FORMS
+--------------------------------------------------
+
+Test every form.
+
+Use:
+
+- valid data
+- invalid data
+- empty values
+- extremely long values
+- whitespace
+- special characters
+- Unicode
+- duplicate data
+
+Check validation both:
+
+CLIENT SIDE
+
+and
+
+SERVER SIDE
+
+Never trust client-side validation alone.
+
+--------------------------------------------------
+27. NAVIGATION
+--------------------------------------------------
+
+Test every sidebar/menu item.
+
+Verify:
+
+- correct page
+- active state
+- browser back
+- browser forward
+- refresh
+- direct URL
+- invalid URL
+- unauthorized URL
+
+No navigation item should lead to a blank page or incorrect screen.
+
+--------------------------------------------------
+28. WINDOW RESIZE TEST
+--------------------------------------------------
+
+Perform an actual resize test.
+
+Do not only test initial page load.
+
+Resize continuously from:
+
+1920px
+to
+320px
+
+and back.
+
+Watch for:
+
+- layout jumps
+- overlapping elements
+- broken grids
+- broken tables
+- text clipping
+- buttons moving outside containers
+- fixed widths
+- incorrect min-width
+- horizontal scrollbar
+
+--------------------------------------------------
+29. Z-INDEX / OVERLAP TEST
+--------------------------------------------------
+
+Look for:
+
+- dropdown behind cards
+- modal behind content
+- tooltip behind container
+- sticky header covering content
+- sidebar covering buttons
+- notification covering controls
+
+Audit:
+
+position
+z-index
+overflow
+
+where necessary.
+
+--------------------------------------------------
+30. SCROLLING TEST
+--------------------------------------------------
+
+Test:
+
+- page scroll
+- table scroll
+- modal scroll
+- sidebar scroll
+- long document scroll
+- nested scroll containers
+
+Avoid unnecessary nested scrollbars.
+
+Never make important controls inaccessible because of overflow.
+
+--------------------------------------------------
+31. DATA INTEGRITY
+--------------------------------------------------
+
+Test:
+
+Create
+Read
+Update
+Delete
+
+where applicable.
+
+Verify:
+
+- UI data
+- backend data
+- database data
+- displayed results
+
+remain consistent.
+
+Test refresh after every important operation.
+
+--------------------------------------------------
+32. ERROR HANDLING
+--------------------------------------------------
+
+Simulate:
+
+- API unavailable
+- database unavailable
+- timeout
+- malformed response
+- invalid response
+- network disconnect
+- authentication expiration
+- permission denied
+- server error
+
+The UI must show a meaningful error.
+
+Never show:
+
+- blank screen
+- endless spinner
+- raw stack trace
+- undefined
+- null
+- [object Object]
+
+--------------------------------------------------
+33. PERFORMANCE
+--------------------------------------------------
+
+Inspect:
+
+- unnecessary renders
+- excessive API calls
+- duplicate requests
+- slow queries
+- large assets
+- large bundles
+- unnecessary state updates
+- memory leaks
+- large DOM
+- unnecessary polling
+
+Do not optimize blindly.
+
+Identify actual bottlenecks and explain them.
+
+--------------------------------------------------
+34. BROWSER COMPATIBILITY
+--------------------------------------------------
+
+Where possible test:
+
+Chrome
+Edge
+Firefox
+Safari
+
+Check:
+
+- layout
+- forms
+- tables
+- scrolling
+- file uploads
+- downloads
+- modals
+- fonts
+- CSS behavior
+
+Clearly state which browsers were actually tested.
+
+Never claim a browser was tested if it was not available.
+
+--------------------------------------------------
+35. SECURITY REVIEW
+--------------------------------------------------
+
+Inspect the application for:
+
+- authentication issues
+- authorization issues
+- IDOR
+- privilege escalation
+- XSS
+- SQL injection
+- unsafe file upload
+- path traversal
+- exposed secrets
+- sensitive data exposure
+- insecure API endpoints
+- missing validation
+- excessive permissions
+
+Do not perform destructive attacks.
+
+--------------------------------------------------
+36. CODE QUALITY REVIEW
+--------------------------------------------------
+
+Inspect the source code.
+
+Look for:
+
+- duplicated code
+- dead code
+- fragile CSS
+- magic numbers
+- hardcoded dimensions
+- unnecessary !important
+- conflicting CSS
+- bad responsive rules
+- deeply nested components
+- poor state management
+- race conditions
+- missing error handling
+- poor naming
+- technical debt
+
+Pay special attention to CSS causing the screenshot problems.
+
+Search for things like:
+
+width: fixed values
+height: fixed values
+min-width
+min-height
+overflow: hidden
+white-space: nowrap
+position: absolute
+left/right fixed positioning
+large margins
+large padding
+grid-template-columns
+flex-basis
+flex-shrink: 0
+!important
+
+These are not automatically bugs, but investigate whether they contribute to the observed layout problems.
+
+==================================================
+37. FIXING RULES
+==================================================
+
+When you identify a problem:
+
+1. Reproduce it.
+2. Identify the root cause.
+3. Explain why it happens.
+4. Fix the root cause.
+5. Retest the original scenario.
+6. Test adjacent functionality.
+7. Test responsive behavior.
+8. Confirm that the fix did not create a regression.
+
+Do NOT apply temporary hacks.
+
+Do NOT simply add:
+
+overflow: hidden;
+
+to hide a problem.
+
+Do NOT reduce font size excessively to make content fit.
+
+Do NOT hide important information.
+
+Do NOT hardcode one viewport size.
+
+Do NOT fix desktop at the expense of mobile.
+
+Do NOT fix mobile at the expense of desktop.
+
+Use maintainable responsive CSS.
+
+==================================================
+38. RESPONSIVE ACCEPTANCE CRITERIA
+==================================================
+
+The application should satisfy:
+
+320px:
+No horizontal overflow.
+No clipped buttons.
+Navigation usable.
+
+375px:
+Forms usable.
+Cards stack correctly.
+
+390px:
+No clipping.
+Readable typography.
+
+414px:
+No overlap.
+
+480px:
+Controls remain usable.
+
+600px:
+Layout transitions cleanly.
+
+768px:
+Tablet layout works.
+
+820px:
+No broken intermediate breakpoint.
+
+1024px:
+Desktop/tablet transition works.
+
+1280px:
+Full desktop layout works.
+
+1440px:
+No excessive empty space.
+
+1920px:
+Content remains centered and visually balanced.
+
+==================================================
+39. VISUAL REGRESSION CHECKLIST
+==================================================
+
+Compare every important screen before and after changes.
+
+Check:
+
+[ ] Header
+[ ] Sidebar
+[ ] Page title
+[ ] Filter area
+[ ] Search
+[ ] Tables
+[ ] Buttons
+[ ] Cards
+[ ] Badges
+[ ] Empty states
+[ ] Loading states
+[ ] Error states
+[ ] Result cards
+[ ] Similarity gauge
+[ ] Dissertation recognition
+[ ] Citation statistics
+[ ] Footer/status bar
+
+Look for:
+
+[ ] clipping
+[ ] overlap
+[ ] excessive whitespace
+[ ] misalignment
+[ ] inconsistent spacing
+[ ] inconsistent borders
+[ ] inconsistent colors
+[ ] inconsistent font sizes
+[ ] broken responsiveness
+[ ] horizontal scrollbar
+[ ] vertical scrollbar problems
+[ ] broken interaction
+
+==================================================
+40. QA REPORT FORMAT
+==================================================
+
+After testing, produce a detailed report.
+
+Use this exact structure:
+
+# IMRD ResearchGuard QA & Engineering Report
+
+## 1. Overall Status
+
+Release Status:
+READY / READY WITH CONDITIONS / NOT RECOMMENDED / BLOCK RELEASE
+
+Overall Quality:
+__/10
+
+Functional Quality:
+__/10
+
+UI/UX:
+__/10
+
+Responsiveness:
+__/10
+
+Accessibility:
+__/10
+
+Performance:
+__/10
+
+Security:
+__/10
+
+Code Quality:
+__/10
+
+--------------------------------------------------
+
+## 2. Executive Summary
+
+Explain the most important findings.
+
+--------------------------------------------------
+
+## 3. Issues Found
+
+Use:
+
+| ID | Severity | Category | Issue | Location | Status |
+|----|----------|----------|-------|----------|--------|
+
+Severity:
+
+P0 = Critical
+P1 = High
+P2 = Medium
+P3 = Low
+P4 = Enhancement
+
+--------------------------------------------------
+
+## 4. UI Glitches
+
+For every UI glitch:
+
+### UI-001
+Title:
+Severity:
+Page:
+Viewport:
+Problem:
+Expected:
+Actual:
+Root Cause:
+Fix:
+Verification:
+
+--------------------------------------------------
+
+## 5. Responsive Issues
+
+Create a table:
+
+| Viewport | Page | Problem | Severity | Fixed |
+|----------|------|---------|----------|-------|
+
+Explicitly test:
+
+320
+375
+390
+414
+480
+600
+768
+820
+1024
+1280
+1440
+1920
+
+--------------------------------------------------
+
+## 6. Functional Bugs
+
+For every functional bug provide:
+
+Steps to reproduce
+Expected result
+Actual result
+Root cause
+Recommended fix
+Regression test
+
+--------------------------------------------------
+
+## 7. UX Improvements
+
+Separate actual bugs from suggestions.
+
+Format:
+
+Problem:
+User impact:
+Recommendation:
+Priority:
+
+--------------------------------------------------
+
+## 8. Developer Findings
+
+Include:
+
+- CSS issues
+- architecture
+- state management
+- API
+- database
+- performance
+- security
+- maintainability
+
+--------------------------------------------------
+
+## 9. Accessibility Findings
+
+List:
+
+- keyboard issues
+- focus issues
+- contrast
+- labels
+- semantic HTML
+- screen reader problems
+
+--------------------------------------------------
+
+## 10. Performance Findings
+
+Include measured metrics if available.
+
+Do NOT invent metrics.
+
+Clearly distinguish:
+
+Measured
+Observed
+Suspected
+Not tested
+
+--------------------------------------------------
+
+## 11. Changes Made
+
+For every implemented fix:
+
+File:
+Component:
+Problem:
+Change:
+Why:
+Potential regression:
+Retested:
+
+--------------------------------------------------
+
+## 12. Remaining Issues
+
+List anything that could not be fixed or tested.
+
+Explain why.
+
+--------------------------------------------------
+
+## 13. Final Recommendation
+
+Clearly state whether the application is:
+
+READY
+
+READY WITH CONDITIONS
+
+NOT RECOMMENDED
+
+BLOCK RELEASE
+
+Explain exactly what must happen before release.
+
+==================================================
+41. LIVE TESTING UPDATES
+==================================================
+
+While working, provide meaningful progress updates.
+
+Use:
+
+## Testing Update
+
+Phase:
+[Current phase]
+
+Completed:
+- ...
+- ...
+- ...
+
+Issues discovered:
+- P0:
+- P1:
+- P2:
+- P3:
+
+Currently testing:
+...
+
+Next:
+...
+
+Do not send an update after every click.
+
+Send updates after meaningful testing groups.
+
+==================================================
+42. IMPORTANT TESTING PRINCIPLE
+==================================================
+
+Do NOT assume that because the page looks acceptable at 1920px that it is responsive.
+
+Do NOT assume that because a button works once that the feature works.
+
+Do NOT assume that because the backend returns data that the UI displays it correctly.
+
+Do NOT assume that because there are no console errors that the application is bug-free.
+
+Think like:
+
+1. A first-time student.
+2. A librarian.
+3. An administrator.
+4. A developer.
+5. An accessibility user.
+6. A user on a 320px phone.
+7. A user on a large monitor.
+8. A user with a slow network.
+9. A user who accidentally clicks twice.
+10. A malicious user attempting unauthorized actions.
+
+==================================================
+43. FINAL REQUIREMENT
+==================================================
+
+Start by inspecting the current application.
+
+First provide:
+
+1. Application architecture summary.
+2. Initial test strategy.
+3. Initial risk assessment.
+4. Screenshot-based issues identified.
+5. Testing plan.
+
+Then perform the tests.
+
+Then fix issues where you have access to the source code.
+
+Then retest.
+
+Finally provide the complete QA + Developer Report.
+
+MOST IMPORTANT:
+
+Do not just tell me what is wrong.
+
+Where you have access to the source code, FIX the problems and then VERIFY the fixes.
+
+For every fix, provide:
+
+BUG
+→ ROOT CAUSE
+→ CODE CHANGE
+→ TEST
+→ RESULT
+
+Never claim something is fixed without retesting it.
