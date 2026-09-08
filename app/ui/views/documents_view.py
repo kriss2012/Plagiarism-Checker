@@ -46,20 +46,24 @@ class DocumentsView(QWidget):
         # 1. Header
         h_box = QHBoxLayout()
         v_title = QVBoxLayout()
+        v_title.setSpacing(2)
         title = QLabel("Student Plagiarism Verification Records & Library Register")
-        title.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        title.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
         sub = QLabel("Official record of student dissertations, similarity indices, and UGC clearance certificates")
-        sub.setStyleSheet("font-size: 12px; color: #64748B;")
+        sub.setStyleSheet("font-size: 11.5px; color: #64748B;")
         v_title.addWidget(title)
         v_title.addWidget(sub)
-        h_box.addLayout(v_title)
-        h_box.addStretch()
+        h_box.addLayout(v_title, 1)
 
         self.export_csv_btn = QPushButton("Export Register (CSV)")
+        self.export_csv_btn.setFixedHeight(32)
+        self.export_csv_btn.setCursor(Qt.PointingHandCursor)
         self.export_csv_btn.clicked.connect(self.export_to_csv)
         h_box.addWidget(self.export_csv_btn)
 
         self.refresh_btn = QPushButton("Refresh")
+        self.refresh_btn.setFixedHeight(32)
+        self.refresh_btn.setCursor(Qt.PointingHandCursor)
         self.refresh_btn.clicked.connect(self.refresh_list)
         h_box.addWidget(self.refresh_btn)
 
@@ -69,7 +73,7 @@ class DocumentsView(QWidget):
         filter_card = QFrame()
         filter_card.setObjectName("card")
         f_layout = QHBoxLayout(filter_card)
-        f_layout.setContentsMargins(10, 8, 10, 8)
+        f_layout.setContentsMargins(12, 8, 12, 8)
         f_layout.setSpacing(10)
 
         self.search_input = QLineEdit()
@@ -105,9 +109,21 @@ class DocumentsView(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(7, QHeaderView.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(8, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(8, QHeaderView.Fixed)
+        self.table.setColumnWidth(8, 145)
+        self.table.horizontalHeader().setMinimumSectionSize(75)
         self.table.verticalHeader().setVisible(False)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         layout.addWidget(self.table)
+
+        # Empty State
+        self.empty_state = EmptyStateWidget(
+            title="No Student Verification Records Found",
+            message="No verified documents match the current search query or filter selection. Try modifying the search filters.",
+        )
+        self.empty_state.setVisible(False)
+        layout.addWidget(self.empty_state)
 
     def refresh_list(self):
         """Fetches all student documents from database."""
