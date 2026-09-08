@@ -181,3 +181,7 @@ Traceback (most recent call last):
     self.view_settings.theme_changed.connect(self._apply_theme)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: 'SettingsView' object has no attribute 'theme_changed'
+2026-09-08 17:27:27 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-08 17:27:27 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-08 17:27:27 [INFO] (ResearchGuard) Extracting content from: EJ1105539.pdf (.pdf)
+2026-09-08 17:27:38 [INFO] (ResearchGuard) Extracting content from: EJ1105539.pdf (.pdf)

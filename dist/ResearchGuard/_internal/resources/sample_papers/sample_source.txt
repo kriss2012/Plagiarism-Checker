@@ -1,0 +1,20 @@
+Title: Attention Mechanisms in Modern Deep Learning Architectures
+
+Abstract
+In this paper we present an overview of attention mechanisms in neural networks. The self-attention mechanism enables models to dynamically weigh the importance of different tokens in an input sequence. Experimental results demonstrate that transformer architectures achieve state-of-the-art performance across natural language processing and computer vision domains.
+
+Introduction
+Artificial intelligence has witnessed unprecedented transformation over the past decade. Traditional recurrent neural networks suffered from sequential computation bottlenecks and vanishing gradient problems during long-range sequence modeling [1]. To overcome these fundamental limitations, Vaswani et al. (2017) introduced the Transformer architecture, which relies entirely on multi-head self-attention.
+
+Methodology
+Our proposed architecture calculates attention weights using scaled dot-product formulation. Given queries Q, keys K, and values V, the attention matrix is computed as softmax(QK^T / sqrt(d_k))V. Multi-head attention projects queries, keys, and values h times with distinct learned linear projections.
+
+Results and Discussion
+The experimental results demonstrate that our proposed model outperforms recurrent baselines while reducing training wall-clock time by 45%. As shown in Table 1, the model achieved a BLEU score of 28.4 on the standard WMT 2014 English-to-German translation benchmark.
+
+Conclusion
+In conclusion, the proposed attention framework exhibits superior generalization and parallelization capabilities compared with existing recurrent approaches. Future work will investigate sparse attention variants for extreme sequence lengths.
+
+References
+[1] Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need. Advances in Neural Information Processing Systems, 30, 5998-6008.
+[2] Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2018). BERT: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805.
