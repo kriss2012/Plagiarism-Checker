@@ -35,7 +35,7 @@ from app.config import (
     LIBRARY_DEPARTMENT,
 )
 from app.database.models import Document
-from app.database.session import get_db, get_setting, set_setting
+from app.database.session import get_db
 from app.ui.theme import get_theme_stylesheet
 from app.ui.views.dashboard_view import DashboardView
 from app.ui.views.documents_view import DocumentsView
@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(APP_TITLE)
         self.resize(1300, 860)
-        self.setMinimumSize(1080, 720)
+        self.setMinimumSize(900, 640)
 
         # Set Window and Taskbar Icon
         icon_path = BASE_DIR / "resources" / "app_icon.png"
@@ -63,9 +63,8 @@ class MainWindow(QMainWindow):
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
 
-        self._active_theme = get_setting("theme", "light")
         self._init_ui()
-        self._apply_theme(self._active_theme)
+        self._apply_theme()
 
     def _init_ui(self):
         # 1. Native Windows Menu Bar
@@ -217,11 +216,7 @@ class MainWindow(QMainWindow):
         act_v_src.triggered.connect(lambda: self._navigate_to(5))
         view_menu.addAction(act_v_src)
 
-        view_menu.addSeparator()
 
-        act_theme = QAction("Toggle &Light / Dark Theme", self)
-        act_theme.triggered.connect(self._toggle_theme)
-        view_menu.addAction(act_theme)
 
         # Tools Menu
         tools_menu = menu_bar.addMenu("&Tools")
@@ -277,38 +272,43 @@ class MainWindow(QMainWindow):
 
         logo_lbl = QLabel()
         if logo_path.exists():
-            pixmap = QPixmap(str(logo_path)).scaled(44, 44, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = QPixmap(str(logo_path)).scaled(46, 46, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             logo_lbl.setPixmap(pixmap)
         else:
             logo_lbl.setText("IMRD")
-            logo_lbl.setStyleSheet("font-size: 18px; font-weight: bold; color: #FFFFFF;")
-        logo_lbl.setFixedWidth(48)
+            logo_lbl.setStyleSheet(
+                "font-size: 18px; font-weight: 800; color: #ffffff; "
+                "font-family: 'Nunito', 'Segoe UI', sans-serif;"
+            )
+        logo_lbl.setFixedWidth(50)
         layout.addWidget(logo_lbl)
 
-        # College Title & Accreditation
+        # College Title & Accreditation — RCPIMRD brand typography
         title_box = QVBoxLayout()
-        title_box.setSpacing(1)
+        title_box.setSpacing(2)
 
-        t1 = QLabel(INSTITUTION_NAME.upper())
-        t1.setStyleSheet("color: #FFFFFF; font-size: 12.5px; font-weight: 800; letter-spacing: 0.3px;")
+        t1 = QLabel("R. C. Patel Educational Trust's")
+        t1.setStyleSheet(
+            "color: #b3e8f7; font-size: 10px; font-weight: 600; letter-spacing: 0.4px;"
+        )
 
-        t2 = QLabel(f"{AFFILIATION_TEXT} • Central Library Verification Cell")
-        t2.setStyleSheet("color: #FDE68A; font-size: 10.5px; font-weight: 600;")
+        t2 = QLabel(INSTITUTION_NAME)
+        t2.setStyleSheet(
+            "color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: 0.2px; "
+            "font-family: 'Nunito', 'Segoe UI', sans-serif;"
+        )
+
+        t3 = QLabel(f"{AFFILIATION_TEXT} • Central Library Verification Cell")
+        t3.setStyleSheet("color: #a0d4ea; font-size: 10px; font-weight: 500;")
 
         title_box.addWidget(t1)
         title_box.addWidget(t2)
+        title_box.addWidget(t3)
         layout.addLayout(title_box, 1)
 
         layout.addStretch()
 
-        # Action controls on the right side of header: Theme toggle and Engine status
-        self.theme_btn = QPushButton("Theme: " + self._active_theme.capitalize())
-        self.theme_btn.setObjectName("headerBtn")
-        self.theme_btn.setCursor(Qt.PointingHandCursor)
-        self.theme_btn.clicked.connect(self._toggle_theme)
-        layout.addWidget(self.theme_btn)
-
-        # Status indicator pill
+        # Engine status indicator pill
         status_pill = QLabel("● Engine Ready")
         status_pill.setObjectName("statusPill")
         layout.addWidget(status_pill)
@@ -316,16 +316,20 @@ class MainWindow(QMainWindow):
         return hdr
 
     def _create_sidebar(self) -> QFrame:
-        """Creates clean Windows desktop sidebar navigation without casual emojis."""
+        """Creates the RCPIMRD-branded sidebar navigation panel."""
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
-        sidebar.setFixedWidth(235)
+        sidebar.setFixedWidth(220)
         layout = QVBoxLayout(sidebar)
         layout.setContentsMargins(6, 12, 6, 12)
         layout.setSpacing(3)
 
         nav_header = QLabel("CENTRAL LIBRARY MODULES")
-        nav_header.setStyleSheet("color: #64748B; font-size: 10px; font-weight: 800; padding: 6px 12px 4px 12px; letter-spacing: 0.5px;")
+        nav_header.setStyleSheet(
+            "color: #21a7d0; font-size: 9.5px; font-weight: 800; "
+            "padding: 6px 12px 4px 12px; letter-spacing: 0.8px; "
+            "font-family: 'Nunito', 'Segoe UI', sans-serif;"
+        )
         layout.addWidget(nav_header)
 
         self.nav_group = QButtonGroup(self)
@@ -354,16 +358,19 @@ class MainWindow(QMainWindow):
 
         layout.addStretch()
 
-        # Institutional Central Library Badge
+        # Institutional badge at the bottom of sidebar
         lib_box = QFrame()
         lib_box.setObjectName("sidebarLibBadge")
         lb_layout = QVBoxLayout(lib_box)
         lb_layout.setContentsMargins(8, 8, 8, 8)
         lb_layout.setSpacing(2)
         lb_title = QLabel("IMRD Central Library")
-        lb_title.setStyleSheet("font-size: 11px; font-weight: 700;")
+        lb_title.setStyleSheet(
+            "font-size: 11px; font-weight: 700; color: #273c66; "
+            "font-family: 'Nunito', 'Segoe UI', sans-serif;"
+        )
         lb_sub = QLabel("Plagiarism Cell • Offline Engine")
-        lb_sub.setStyleSheet("font-size: 9.5px;")
+        lb_sub.setStyleSheet("font-size: 9.5px; color: #21a7d0;")
         lb_layout.addWidget(lb_title)
         lb_layout.addWidget(lb_sub)
         layout.addWidget(lib_box)
@@ -385,15 +392,9 @@ class MainWindow(QMainWindow):
         elif index == 5:
             self.view_sources.refresh_list()
 
-    def _toggle_theme(self):
-        new_theme = "light" if self._active_theme == "dark" else "dark"
-        self._apply_theme(new_theme)
-
-    def _apply_theme(self, theme_name: str):
-        self._active_theme = theme_name
-        set_setting("theme", theme_name)
-        self.setStyleSheet(get_theme_stylesheet(theme_name))
-        self.theme_btn.setText("Theme: " + theme_name.capitalize())
+    def _apply_theme(self, _theme_name: str = "light"):
+        """Applies the RCPIMRD institutional theme. Dark mode has been removed."""
+        self.setStyleSheet(get_theme_stylesheet())
 
     def _open_document_dialog(self):
         file_path, _ = QFileDialog.getOpenFileName(

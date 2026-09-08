@@ -1,6 +1,6 @@
 """Settings view providing comprehensive configuration tabs for analysis, documents, reports, and privacy."""
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -25,8 +25,6 @@ from app.database.session import get_all_settings, get_setting, set_setting
 class SettingsView(QWidget):
     """Configuration control panel for ResearchGuard application parameters."""
 
-    theme_changed = Signal(str)  # "dark" or "light"
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self._init_ui()
@@ -42,7 +40,7 @@ class SettingsView(QWidget):
         v_title = QVBoxLayout()
         v_title.setSpacing(2)
         title = QLabel("Institutional Settings & System Configuration")
-        title.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
+        title.setStyleSheet("font-size: 18px; font-weight: 800; color: #112958; font-family: 'Nunito', 'Segoe UI', sans-serif;")
         sub = QLabel("Customize IMRD Shirpur Central Library verification thresholds, UGC compliance policies, and templates")
         sub.setStyleSheet("font-size: 11.5px; color: #64748B;")
         h_box.addWidget(title)
@@ -57,10 +55,6 @@ class SettingsView(QWidget):
         form_gen = QFormLayout(tab_gen)
         form_gen.setContentsMargins(18, 18, 18, 18)
         form_gen.setSpacing(14)
-
-        self.theme_combo = QComboBox()
-        self.theme_combo.addItems(["Light Mode", "Dark Mode"])
-        form_gen.addRow("UI Appearance Theme:", self.theme_combo)
 
         self.chk_auto_save = QCheckBox("Automatically archive generated reports")
         form_gen.addRow("Report Archiving:", self.chk_auto_save)
@@ -201,8 +195,6 @@ class SettingsView(QWidget):
         settings = get_all_settings()
 
         # General
-        th = settings.get("theme", "light")
-        self.theme_combo.setCurrentIndex(0 if th == "light" else 1)
         self.chk_auto_save.setChecked(bool(settings.get("auto_save_reports", True)))
         self.chk_confirm_del.setChecked(bool(settings.get("confirm_deletion", True)))
 
@@ -229,8 +221,6 @@ class SettingsView(QWidget):
 
     def save_settings(self):
         """Persists all modified settings to database."""
-        chosen_theme = "dark" if self.theme_combo.currentIndex() == 0 else "light"
-        set_setting("theme", chosen_theme)
         set_setting("auto_save_reports", self.chk_auto_save.isChecked())
         set_setting("confirm_deletion", self.chk_confirm_del.isChecked())
 
@@ -251,5 +241,4 @@ class SettingsView(QWidget):
 
         set_setting("offline_mode", self.chk_offline_mode.isChecked())
 
-        self.theme_changed.emit(chosen_theme)
         QMessageBox.information(self, "Settings Saved", "Application settings have been updated successfully.")
