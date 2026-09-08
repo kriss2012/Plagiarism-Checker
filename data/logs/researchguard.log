@@ -163,3 +163,21 @@
 2026-09-08 08:47:22 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-9\test_pdf_report_generation0\test_report.pdf
 2026-09-08 08:47:22 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-9\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
 2026-09-08 08:47:22 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-9\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-08 17:21:43 [INFO] (ResearchGuard) ==================================================
+2026-09-08 17:21:43 [INFO] (ResearchGuard) Starting IMRD ResearchGuard – Student Paper & Dissertation Plagiarism Checker
+2026-09-08 17:21:43 [INFO] (ResearchGuard) Python: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+2026-09-08 17:21:43 [INFO] (ResearchGuard) ==================================================
+2026-09-08 17:21:43 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-08 17:21:43 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-08 17:21:43 [INFO] (ResearchGuard) Database initialised successfully.
+2026-09-08 17:21:46 [ERROR] (ResearchGuard) Failed to show main window: 'SettingsView' object has no attribute 'theme_changed'
+Traceback (most recent call last):
+  File "D:\Programs\Poligram\app\main.py", line 89, in _launch_main
+    window = MainWindow()
+  File "D:\Programs\Poligram\app\ui\main_window.py", line 66, in __init__
+    self._init_ui()
+    ~~~~~~~~~~~~~^^
+  File "D:\Programs\Poligram\app\ui\main_window.py", line 114, in _init_ui
+    self.view_settings.theme_changed.connect(self._apply_theme)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SettingsView' object has no attribute 'theme_changed'

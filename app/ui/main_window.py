@@ -111,7 +111,6 @@ class MainWindow(QMainWindow):
         self.view_new_check.analysis_completed.connect(self._on_analysis_finished)
         self.view_results.open_match_viewer.connect(self._on_open_match_viewer)
         self.view_match_viewer.back_to_results.connect(lambda: self._navigate_to(3))
-        self.view_settings.theme_changed.connect(self._apply_theme)
 
         # Stack indices:
         # 0: Dashboard
