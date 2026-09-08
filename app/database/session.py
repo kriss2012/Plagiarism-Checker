@@ -19,7 +19,7 @@ engine = create_engine(
     echo=False,
 )
 
-SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+SessionFactory = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
 Session = scoped_session(SessionFactory)
 
 
@@ -79,6 +79,11 @@ def get_db():
         logger.error(f"Database session error: {e}")
         raise
     finally:
+        # expunge_all() detaches all ORM objects from the session while
+        # preserving their already-loaded column values in memory, which
+        # prevents DetachedInstanceError when callers access attributes
+        # after this context manager exits.
+        session.expunge_all()
         session.close()
 
 
