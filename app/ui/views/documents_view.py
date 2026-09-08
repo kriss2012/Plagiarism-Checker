@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
 from app.config import REPORTS_DIR
 from app.database.models import Document
 from app.database.session import get_all_documents, get_db
+from app.ui.widgets.cards import EmptyStateWidget
 from app.ui.widgets.cards import RiskBadge
 
 
