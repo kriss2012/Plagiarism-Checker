@@ -95,3 +95,20 @@
 2026-09-07 18:09:07 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-5\test_pdf_report_generation0\test_report.pdf
 2026-09-07 18:09:07 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-5\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
 2026-09-07 18:09:08 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-5\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-08 08:19:14 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-08 08:19:14 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-08 08:19:14 [INFO] (ResearchGuard) Starting plagiarism analysis for: suspicious_paper.txt
+2026-09-08 08:19:14 [INFO] (ResearchGuard) Comparing 21 document sentences against 16 source sentences.
+2026-09-08 08:19:29 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-08 08:19:29 [INFO] (ResearchGuard) Starting plagiarism analysis for: sample_source.txt
+2026-09-08 08:19:29 [INFO] (ResearchGuard) Comparing 22 document sentences against 16 source sentences.
+2026-09-08 08:19:29 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-08 08:19:29 [INFO] (ResearchGuard) Extracting content from: test_sample.pdf (.pdf)
+2026-09-08 08:19:30 [INFO] (ResearchGuard) Extracting content from: test_sample.docx (.docx)
+2026-09-08 08:19:31 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-08 08:19:31 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-08 08:19:31 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-08 08:19:31 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-6\test_pdf_report_generation0\test_report.pdf
+2026-09-08 08:19:32 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-6\test_pdf_report_generation0\test_report.pdf
+2026-09-08 08:19:32 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-6\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-08 08:19:33 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-6\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf

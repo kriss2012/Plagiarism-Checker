@@ -30,6 +30,8 @@ hidden_imports = [
     'reportlab.lib.colors',
     'reportlab.lib.pagesizes',
     'reportlab.lib.styles',
+    'requests',
+    'numpy',
 ]
 
 a = Analysis(
