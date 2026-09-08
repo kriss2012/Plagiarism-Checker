@@ -156,13 +156,13 @@ class SettingsView(QWidget):
         """)
         pb_box = QVBoxLayout(priv_banner)
         pb_title = QLabel("OFFLINE-FIRST PRIVACY GUARANTEE")
-        pb_title.setStyleSheet("font-weight: 800; color: #047857; font-size: 13px;")
+        pb_title.setStyleSheet("font-weight: 800; font-size: 13px;")
         pb_desc = QLabel(
             "Your research papers are analyzed entirely on this local workstation. "
             "No document content is uploaded to external clouds, commercial third-party LLMs, "
             "or unauthorized indexing engines."
         )
-        pb_desc.setStyleSheet("color: #334155; font-size: 11.5px;")
+        pb_desc.setStyleSheet("font-size: 11.5px;")
         pb_desc.setWordWrap(True)
         pb_box.addWidget(pb_title)
         pb_box.addWidget(pb_desc)

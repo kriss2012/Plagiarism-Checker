@@ -56,7 +56,7 @@ class HelpView(QWidget):
         sop_card.setObjectName("card")
         sop_box = QVBoxLayout(sop_card)
         sop_title = QLabel("LIBRARIAN STANDARD OPERATING PROCEDURE (SOP) FOR STUDENT PAPERS")
-        sop_title.setStyleSheet("font-weight: 800; color: #002461; font-size: 12px; margin-bottom: 4px;")
+        sop_title.setStyleSheet("font-weight: 800; font-size: 12px; margin-bottom: 4px;")
         sop_box.addWidget(sop_title)
 
         sop_html = """
@@ -76,7 +76,7 @@ class HelpView(QWidget):
         for the Student, Research Guide, and Librarian.</p>
         """
         lbl_sop = QLabel(sop_html)
-        lbl_sop.setStyleSheet("color: #0F172A; font-size: 12px; line-height: 1.5;")
+        lbl_sop.setStyleSheet("font-size: 12px; line-height: 1.5;")
         lbl_sop.setWordWrap(True)
         sop_box.addWidget(lbl_sop)
         layout.addWidget(sop_card)
@@ -86,40 +86,40 @@ class HelpView(QWidget):
         ugc_card.setObjectName("card")
         ugc_box = QVBoxLayout(ugc_card)
         ugc_title = QLabel("UGC PLAGIARISM REGULATIONS 2018 – PENALTY & COMPLIANCE TIERS")
-        ugc_title.setStyleSheet("font-weight: 800; color: #005FEA; font-size: 12px; margin-bottom: 4px;")
+        ugc_title.setStyleSheet("font-weight: 800; font-size: 12px; margin-bottom: 4px;")
         ugc_box.addWidget(ugc_title)
 
         ugc_html = """
         <table width='100%' cellpadding='4' cellspacing='0' style='border-collapse: collapse;'>
-            <tr style='background-color: #F8FAFC; color: #002461;'>
+            <tr>
                 <th align='left'><b>UGC Level</b></th>
                 <th align='left'><b>Similarity Range</b></th>
                 <th align='left'><b>Institutional Action / Recommendation</b></th>
             </tr>
             <tr>
-                <td><font color='#047857'><b>Level 0</b></font></td>
+                <td><b>Level 0</b></td>
                 <td><b>Similarities up to 10.0%</b></td>
                 <td>Minor textual overlap. <b>Permitted for final thesis submission and evaluation. Clearance granted.</b></td>
             </tr>
-            <tr style='background-color: #F8FAFC;'>
-                <td><font color='#B45309'><b>Level 1</b></font></td>
+            <tr>
+                <td><b>Level 1</b></td>
                 <td><b>Similarities above 10.0% to 40.0%</b></td>
                 <td>Student must be asked to submit a revised script within a stipulated time-period not exceeding 6 months.</td>
             </tr>
             <tr>
-                <td><font color='#B91C1C'><b>Level 2</b></font></td>
+                <td><b>Level 2</b></td>
                 <td><b>Similarities above 40.0% to 60.0%</b></td>
                 <td>Student shall be debarred from submitting a revised script for a period of one year.</td>
             </tr>
-            <tr style='background-color: #F8FAFC;'>
-                <td><font color='#991B1B'><b>Level 3</b></font></td>
+            <tr>
+                <td><b>Level 3</b></td>
                 <td><b>Similarities above 60.0%</b></td>
                 <td>Severe academic misconduct. Student registration for that program shall be cancelled.</td>
             </tr>
         </table>
         """
         lbl_ugc = QLabel(ugc_html)
-        lbl_ugc.setStyleSheet("color: #0F172A; font-size: 11.5px; line-height: 1.5;")
+        lbl_ugc.setStyleSheet("font-size: 11.5px; line-height: 1.5;")
         lbl_ugc.setWordWrap(True)
         ugc_box.addWidget(lbl_ugc)
         layout.addWidget(ugc_card)
@@ -129,7 +129,7 @@ class HelpView(QWidget):
         meth_card.setObjectName("card")
         m_box = QVBoxLayout(meth_card)
         m_title = QLabel("SIMILARITY DETECTION ALGORITHMIC PIPELINE")
-        m_title.setStyleSheet("font-weight: 800; color: #002461; font-size: 12px; margin-bottom: 4px;")
+        m_title.setStyleSheet("font-weight: 800; font-size: 12px; margin-bottom: 4px;")
         m_box.addWidget(m_title)
 
         method_text = """
@@ -140,26 +140,19 @@ class HelpView(QWidget):
         <p><b>5. References Section Exclusion:</b> Detects bibliography and reference entries and excludes them from inflating the body similarity index.</p>
         """
         lbl_meth = QLabel(method_text)
-        lbl_meth.setStyleSheet("color: #334155; font-size: 11.5px; line-height: 1.5;")
+        lbl_meth.setStyleSheet("font-size: 11.5px; line-height: 1.5;")
         lbl_meth.setWordWrap(True)
         m_box.addWidget(lbl_meth)
         layout.addWidget(meth_card)
 
         # 4. Academic Ethics & Disclaimer
         disc_frame = QFrame()
-        disc_frame.setStyleSheet("""
-            QFrame {
-                background-color: #FFFBEB;
-                border: 1px solid #F59E0B;
-                border-radius: 6px;
-                padding: 10px 14px;
-            }
-        """)
+        disc_frame.setObjectName("card")
         d_box = QVBoxLayout(disc_frame)
         d_title = QLabel("ACADEMIC ETHICS & DISCLAIMER NOTICE")
-        d_title.setStyleSheet("font-weight: 800; color: #B45309; font-size: 11px;")
+        d_title.setStyleSheet("font-weight: 800; font-size: 11px;")
         d_desc = QLabel(ACADEMIC_DISCLAIMER)
-        d_desc.setStyleSheet("color: #78350F; font-size: 11px; line-height: 1.4;")
+        d_desc.setStyleSheet("font-size: 11px; line-height: 1.4;")
         d_desc.setWordWrap(True)
         d_box.addWidget(d_title)
         d_box.addWidget(d_desc)
@@ -170,7 +163,7 @@ class HelpView(QWidget):
         diag_card.setObjectName("card")
         diag_box = QVBoxLayout(diag_card)
         diag_title = QLabel("CENTRAL LIBRARY SYSTEM & RUNTIME DIAGNOSTICS")
-        diag_title.setStyleSheet("font-weight: 800; color: #002461; font-size: 11px; margin-bottom: 4px;")
+        diag_title.setStyleSheet("font-weight: 800; font-size: 11px; margin-bottom: 4px;")
         diag_box.addWidget(diag_title)
 
         diag_html = f"""
@@ -181,7 +174,7 @@ class HelpView(QWidget):
         <b>Database:</b> SQLite 3 Local Persistence (Offline-First)<br/>
         """
         lbl_diag = QLabel(diag_html)
-        lbl_diag.setStyleSheet("color: #64748B; font-size: 11px; line-height: 1.5;")
+        lbl_diag.setStyleSheet("font-size: 11px; line-height: 1.5;")
         lbl_diag.setWordWrap(True)
         diag_box.addWidget(lbl_diag)
         layout.addWidget(diag_card)
