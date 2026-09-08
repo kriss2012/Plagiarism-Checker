@@ -344,7 +344,9 @@ class NewCheckView(QWidget):
             self.queue_table.setItem(idx, 4, QTableWidgetItem(item["status"]))
 
             rm_btn = QPushButton("Remove")
-            rm_btn.setFixedHeight(22)
+            rm_btn.setObjectName("dangerBtn")
+            rm_btn.setFixedHeight(24)
+            rm_btn.setCursor(Qt.PointingHandCursor)
             rm_btn.clicked.connect(lambda chk=False, row=idx: self._remove_from_queue(row))
             self.queue_table.setCellWidget(idx, 5, rm_btn)
 

@@ -41,6 +41,7 @@ class MatchViewerView(QWidget):
         # Top Header Bar
         top_bar = QHBoxLayout()
         self.back_btn = QPushButton("◀ Back to Summary")
+        self.back_btn.setFixedHeight(34)
         self.back_btn.clicked.connect(self.back_to_results.emit)
         top_bar.addWidget(self.back_btn)
 
@@ -54,10 +55,12 @@ class MatchViewerView(QWidget):
         top_bar.addWidget(self.match_counter_lbl)
 
         self.prev_btn = QPushButton("◀ Previous")
+        self.prev_btn.setFixedHeight(34)
         self.prev_btn.clicked.connect(self._prev_match)
         top_bar.addWidget(self.prev_btn)
 
         self.next_btn = QPushButton("Next ▶")
+        self.next_btn.setFixedHeight(34)
         self.next_btn.clicked.connect(self._next_match)
         top_bar.addWidget(self.next_btn)
 
@@ -123,23 +126,21 @@ class MatchViewerView(QWidget):
         ins_layout.addWidget(QLabel("Source Excerpt:"))
         self.ins_source_text = QTextEdit()
         self.ins_source_text.setReadOnly(True)
-        self.ins_source_text.setStyleSheet("""
-            background-color: #FFFFFF;
-            color: #0F172A;
-            border: 1px solid #CBD5E1;
-            border-radius: 6px;
-            font-size: 13px;
-        """)
+        self.ins_source_text.setObjectName("matchSourceText")
         self.ins_source_text.setMaximumHeight(150)
         ins_layout.addWidget(self.ins_source_text)
 
         # Action Buttons
         ins_btn_row = QHBoxLayout()
         self.ignore_btn = QPushButton("Ignore Match")
+        self.ignore_btn.setFixedHeight(34)
+        self.ignore_btn.setCursor(Qt.PointingHandCursor)
         self.ignore_btn.clicked.connect(self._toggle_ignore_match)
         ins_btn_row.addWidget(self.ignore_btn)
 
         self.copy_btn = QPushButton("Copy Excerpt")
+        self.copy_btn.setFixedHeight(34)
+        self.copy_btn.setCursor(Qt.PointingHandCursor)
         self.copy_btn.clicked.connect(self._copy_excerpt)
         ins_btn_row.addWidget(self.copy_btn)
 
