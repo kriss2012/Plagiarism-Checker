@@ -27,21 +27,12 @@ class FileDropWidget(QFrame):
         self._init_ui()
 
     def _init_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #F8FAFC;
-                border: 2px dashed #CBD5E1;
-                border-radius: 8px;
-            }
-            QFrame:hover {
-                border-color: #005FEA;
-                background-color: #EFF6FF;
-            }
-        """)
+        self._reset_style()
 
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(6)
+        layout.setContentsMargins(16, 16, 16, 16)
 
         self.main_text = QLabel("Drag & Drop Student Dissertation or Research Paper Here")
         self.main_text.setStyleSheet("font-size: 13.5px; font-weight: 700; color: #002461; background: transparent; border: none;")
@@ -57,9 +48,23 @@ class FileDropWidget(QFrame):
         self.browse_btn = QPushButton("Browse Files...")
         self.browse_btn.setObjectName("primaryBtn")
         self.browse_btn.setFixedWidth(140)
+        self.browse_btn.setFixedHeight(34)
         self.browse_btn.setCursor(Qt.PointingHandCursor)
         self.browse_btn.clicked.connect(self._open_file_dialog)
         layout.addWidget(self.browse_btn, alignment=Qt.AlignCenter)
+
+    def _reset_style(self):
+        self.setStyleSheet("""
+            FileDropWidget {
+                background-color: #F8FAFC;
+                border: 2px dashed #CBD5E1;
+                border-radius: 8px;
+            }
+            FileDropWidget:hover {
+                border-color: #005FEA;
+                background-color: #EFF6FF;
+            }
+        """)
 
     def _open_file_dialog(self):
         files, _ = QFileDialog.getOpenFileNames(
@@ -75,7 +80,7 @@ class FileDropWidget(QFrame):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
             self.setStyleSheet("""
-                QFrame {
+                FileDropWidget {
                     background-color: #EFF6FF;
                     border: 2px dashed #005FEA;
                     border-radius: 8px;
@@ -85,7 +90,7 @@ class FileDropWidget(QFrame):
             event.ignore()
 
     def dragLeaveEvent(self, event):
-        self._init_ui()
+        self._reset_style()
 
     def dropEvent(self, event: QDropEvent):
         urls = event.mimeData().urls()
@@ -97,6 +102,7 @@ class FileDropWidget(QFrame):
             if local_path and Path(local_path).suffix.lower() in allowed_exts:
                 valid_paths.append(local_path)
 
-        self._init_ui()
+        self._reset_style()
         if valid_paths:
             self.files_selected.emit(valid_paths)
+

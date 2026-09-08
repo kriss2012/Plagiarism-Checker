@@ -14,7 +14,7 @@ class SimilarityGaugeWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._value = 0.0
-        self.setMinimumSize(220, 155)
+        self.setMinimumSize(200, 145)
 
     def set_value(self, value: float):
         self._value = max(0.0, min(100.0, float(value)))
@@ -23,17 +23,18 @@ class SimilarityGaugeWidget(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.TextAntialiasing)
 
         width = self.width()
         height = self.height()
-        side = min(width, height * 1.8)
+        side = min(width, height * 1.7)
 
         cx = width / 2.0
-        cy = height - 20.0
-        radius = side * 0.42
+        cy = height - 16.0
+        radius = side * 0.40
 
         # Track background
-        pen_track = QPen(QColor("#CBD5E1"), 14, Qt.SolidLine, Qt.RoundCap)
+        pen_track = QPen(QColor("#CBD5E1"), 12, Qt.SolidLine, Qt.RoundCap)
         painter.setPen(pen_track)
         rect = QRectF(cx - radius, cy - radius, radius * 2, radius * 2)
         painter.drawArc(rect, 0 * 16, 180 * 16)
@@ -51,28 +52,28 @@ class SimilarityGaugeWidget(QWidget):
             arc_color = QColor("#991B1B")  # Crimson (Rejected)
 
         if self._value > 0:
-            pen_val = QPen(arc_color, 14, Qt.SolidLine, Qt.RoundCap)
+            pen_val = QPen(arc_color, 12, Qt.SolidLine, Qt.RoundCap)
             painter.setPen(pen_val)
             painter.drawArc(rect, 180 * 16, int(-val_angle * 16))
 
         # Center Value Text - High contrast dark navy
         painter.setPen(QColor("#002461"))
-        font = QFont("Segoe UI", 24, QFont.Bold)
+        font = QFont("Segoe UI", 22, QFont.Bold)
         painter.setFont(font)
         text_val = f"{self._value:.1f}%"
-        painter.drawText(QRectF(cx - 80, cy - 50, 160, 34), Qt.AlignCenter, text_val)
+        painter.drawText(QRectF(cx - 75, cy - 46, 150, 30), Qt.AlignCenter, text_val)
 
         # Subtitle
         painter.setPen(QColor("#64748B"))
-        font_sub = QFont("Segoe UI", 8.5, QFont.DemiBold)
+        font_sub = QFont("Segoe UI", 8, QFont.Bold)
         painter.setFont(font_sub)
-        painter.drawText(QRectF(cx - 80, cy - 16, 160, 18), Qt.AlignCenter, "SIMILARITY INDEX")
+        painter.drawText(QRectF(cx - 75, cy - 16, 150, 16), Qt.AlignCenter, "SIMILARITY INDEX")
 
         # Range labels
-        font_lbl = QFont("Segoe UI", 8)
+        font_lbl = QFont("Segoe UI", 7.5)
         painter.setFont(font_lbl)
-        painter.drawText(int(cx - radius - 15), int(cy + 14), "0%")
-        painter.drawText(int(cx + radius - 5), int(cy + 14), "100%")
+        painter.drawText(int(cx - radius - 12), int(cy + 12), "0%")
+        painter.drawText(int(cx + radius - 6), int(cy + 12), "100%")
 
 
 class RiskDistributionWidget(QWidget):
@@ -155,12 +156,14 @@ class TimelineBarChartWidget(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.TextAntialiasing)
 
         w = self.width()
         h = self.height()
 
         if not self._values:
             painter.setPen(QColor("#64748B"))
+            painter.setFont(QFont("Segoe UI", 9.5))
             painter.drawText(self.rect(), Qt.AlignCenter, "No verification history recorded yet")
             return
 

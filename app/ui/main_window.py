@@ -268,7 +268,7 @@ class MainWindow(QMainWindow):
         hdr.setObjectName("instHeader")
         layout = QHBoxLayout(hdr)
         layout.setContentsMargins(16, 6, 16, 6)
-        layout.setSpacing(14)
+        layout.setSpacing(12)
 
         # College Logo
         logo_path = BASE_DIR / "resources" / "app_icon.png"
@@ -277,11 +277,12 @@ class MainWindow(QMainWindow):
 
         logo_lbl = QLabel()
         if logo_path.exists():
-            pixmap = QPixmap(str(logo_path)).scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = QPixmap(str(logo_path)).scaled(44, 44, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             logo_lbl.setPixmap(pixmap)
         else:
             logo_lbl.setText("IMRD")
-            logo_lbl.setStyleSheet("font-size: 20px; font-weight: bold; color: #FFFFFF;")
+            logo_lbl.setStyleSheet("font-size: 18px; font-weight: bold; color: #FFFFFF;")
+        logo_lbl.setFixedWidth(48)
         layout.addWidget(logo_lbl)
 
         # College Title & Accreditation
@@ -289,74 +290,27 @@ class MainWindow(QMainWindow):
         title_box.setSpacing(1)
 
         t1 = QLabel(INSTITUTION_NAME.upper())
-        t1.setStyleSheet("color: #FFFFFF; font-size: 13px; font-weight: 800; letter-spacing: 0.3px;")
-        
+        t1.setStyleSheet("color: #FFFFFF; font-size: 12.5px; font-weight: 800; letter-spacing: 0.3px;")
+
         t2 = QLabel(f"{AFFILIATION_TEXT} • Central Library Verification Cell")
-        t2.setStyleSheet("color: #FDE68A; font-size: 11px; font-weight: 600;")
+        t2.setStyleSheet("color: #FDE68A; font-size: 10.5px; font-weight: 600;")
 
         title_box.addWidget(t1)
         title_box.addWidget(t2)
-        layout.addLayout(title_box)
+        layout.addLayout(title_box, 1)
 
         layout.addStretch()
 
-        # Quick action buttons on the right side of header
-        quick_new_btn = QPushButton("+ Verify Student Paper")
-        quick_new_btn.setObjectName("certBtn")
-        quick_new_btn.setFixedHeight(34)
-        quick_new_btn.setCursor(Qt.PointingHandCursor)
-        quick_new_btn.clicked.connect(lambda: self._navigate_to(1))
-        layout.addWidget(quick_new_btn)
-
-        quick_rec_btn = QPushButton("Student Archive")
-        quick_rec_btn.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(255, 255, 255, 0.15);
-                color: #FFFFFF;
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                font-weight: 600;
-                font-size: 12px;
-                padding: 6px 14px;
-                border-radius: 5px;
-            }
-            QPushButton:hover {
-                background-color: rgba(255, 255, 255, 0.25);
-            }
-        """)
-        quick_rec_btn.setFixedHeight(34)
-        quick_rec_btn.setCursor(Qt.PointingHandCursor)
-        quick_rec_btn.clicked.connect(lambda: self._navigate_to(2))
-        layout.addWidget(quick_rec_btn)
-
-        self.theme_btn = QPushButton("Theme")
-        self.theme_btn.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(255, 255, 255, 0.12);
-                color: #FFFFFF;
-                border: 1px solid rgba(255, 255, 255, 0.25);
-                font-size: 11px;
-                padding: 6px 10px;
-                border-radius: 5px;
-            }
-            QPushButton:hover {
-                background-color: rgba(255, 255, 255, 0.22);
-            }
-        """)
-        self.theme_btn.setFixedHeight(34)
+        # Action controls on the right side of header: Theme toggle and Engine status
+        self.theme_btn = QPushButton("Theme: " + self._active_theme.capitalize())
+        self.theme_btn.setObjectName("headerBtn")
+        self.theme_btn.setCursor(Qt.PointingHandCursor)
         self.theme_btn.clicked.connect(self._toggle_theme)
         layout.addWidget(self.theme_btn)
 
         # Status indicator pill
-        status_pill = QLabel("● Ready")
-        status_pill.setStyleSheet("""
-            background-color: rgba(16, 185, 129, 0.2);
-            color: #A7F3D0;
-            border: 1px solid #10B981;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-        """)
+        status_pill = QLabel("● Engine Ready")
+        status_pill.setObjectName("statusPill")
         layout.addWidget(status_pill)
 
         return hdr
@@ -365,9 +319,10 @@ class MainWindow(QMainWindow):
         """Creates clean Windows desktop sidebar navigation without casual emojis."""
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
+        sidebar.setFixedWidth(235)
         layout = QVBoxLayout(sidebar)
         layout.setContentsMargins(6, 12, 6, 12)
-        layout.setSpacing(4)
+        layout.setSpacing(3)
 
         nav_header = QLabel("CENTRAL LIBRARY MODULES")
         nav_header.setStyleSheet("color: #64748B; font-size: 10px; font-weight: 800; padding: 6px 12px 4px 12px; letter-spacing: 0.5px;")
@@ -401,16 +356,9 @@ class MainWindow(QMainWindow):
 
         # Institutional Central Library Badge
         lib_box = QFrame()
-        lib_box.setStyleSheet("""
-            QFrame {
-                background-color: #F8FAFC;
-                border: 1px solid #CBD5E1;
-                border-radius: 6px;
-                padding: 8px 10px;
-                margin: 4px;
-            }
-        """)
+        lib_box.setObjectName("sidebarLibBadge")
         lb_layout = QVBoxLayout(lib_box)
+        lb_layout.setContentsMargins(8, 8, 8, 8)
         lb_layout.setSpacing(2)
         lb_title = QLabel("IMRD Central Library")
         lb_title.setStyleSheet("font-size: 11px; font-weight: 700; color: #002461;")

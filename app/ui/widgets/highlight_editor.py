@@ -31,23 +31,17 @@ class HighlightEditorWidget(QFrame):
         filter_bar.setSpacing(6)
 
         lbl = QLabel("Filter Highlights:")
-        lbl.setStyleSheet("color: #94A3B8; font-weight: 600; font-size: 11px;")
+        lbl.setStyleSheet("color: #64748B; font-weight: 700; font-size: 11px;")
         filter_bar.addWidget(lbl)
 
         self.filter_buttons = {}
         filters = ["All", "Exact", "Fuzzy", "Semantic", "Quoted"]
         for f in filters:
             btn = QPushButton(f)
+            btn.setObjectName("filterBtn")
             btn.setCheckable(True)
             btn.setFixedHeight(26)
-            btn.setStyleSheet("""
-                QPushButton {
-                    padding: 3px 10px; font-size: 11px; border-radius: 4px;
-                }
-                QPushButton:checked {
-                    background-color: #4F46E5; color: white; font-weight: 600;
-                }
-            """)
+            btn.setCursor(Qt.PointingHandCursor)
             btn.clicked.connect(lambda checked, name=f: self._set_filter(name))
             self.filter_buttons[f] = btn
             filter_bar.addWidget(btn)
@@ -59,19 +53,8 @@ class HighlightEditorWidget(QFrame):
 
         # Document Text Display
         self.text_edit = QTextEdit()
+        self.text_edit.setObjectName("highlightEditorText")
         self.text_edit.setReadOnly(True)
-        self.text_edit.setStyleSheet("""
-            QTextEdit {
-                background-color: #0B0F19;
-                color: #F8FAFC;
-                border: 1px solid #334155;
-                border-radius: 6px;
-                padding: 16px;
-                font-family: 'Georgia', serif;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-        """)
         self.text_edit.cursorPositionChanged.connect(self._on_cursor_changed)
         layout.addWidget(self.text_edit)
 
