@@ -202,3 +202,11 @@ AttributeError: 'SettingsView' object has no attribute 'theme_changed'
 2026-09-09 09:07:14 [INFO] (ResearchGuard) Initializing SQLite database tables...
 2026-09-09 09:07:15 [INFO] (ResearchGuard) Database initialized successfully.
 2026-09-09 09:07:15 [INFO] (ResearchGuard) Database initialised successfully.
+2026-09-09 11:32:58 [INFO] (ResearchGuard) ==================================================
+2026-09-09 11:32:58 [INFO] (ResearchGuard) Starting IMRD ResearchGuard – Student Paper & Dissertation Plagiarism Checker
+2026-09-09 11:32:58 [INFO] (ResearchGuard) Python: 3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]
+2026-09-09 11:32:58 [INFO] (ResearchGuard) ==================================================
+2026-09-09 11:32:58 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-09 11:32:59 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-09 11:32:59 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-09 11:32:59 [INFO] (ResearchGuard) Database initialised successfully.
