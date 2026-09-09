@@ -266,3 +266,19 @@ AttributeError: 'SettingsView' object has no attribute 'theme_changed'
 2026-09-09 12:42:08 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_pdf_report_generation0\test_report.pdf
 2026-09-09 12:42:08 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
 2026-09-09 12:42:09 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-09 12:52:11 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-2\test_pdf_report_generation0\test_report.pdf
+2026-09-09 12:52:11 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-2\test_pdf_report_generation0\test_report.pdf
+2026-09-09 12:52:11 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-2\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-09 12:52:12 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-2\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Comparing 2 sentences against 1 source sentences.
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-09 12:53:00 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-09 12:53:04 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-09 12:53:04 [INFO] (ResearchGuard) Comparing 1 sentences against 0 source sentences.

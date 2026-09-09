@@ -22,12 +22,17 @@ class HTMLReportGenerator:
         document_data: Dict,
         score_breakdown: Dict,
         matches: List[Dict],
-        citation_data: Dict,
-        structure_data: Dict,
+        citation_data: Optional[Dict] = None,
+        structure_data: Optional[Dict] = None,
         metadata: Optional[Dict] = None,
+        extracted_text: Optional[str] = None,
+        references: Optional[List] = None,
+        citation_issues: Optional[List] = None,
     ) -> Path:
         """Assembles and writes the interactive HTML report."""
         meta = metadata or {}
+        citation_data = citation_data or {}
+        structure_data = structure_data or {}
         overall_sim = score_breakdown.get("overall_similarity", 0.0)
         risk_lvl = score_breakdown.get("risk_level", "Very Low")
 
@@ -242,7 +247,87 @@ class HTMLReportGenerator:
                 </tbody>
             </table>
         </div>
+"""
 
+        # References Section if available
+        if references:
+            html_content += """
+        <div class="table-section">
+            <h2 class="section-title">Bibliography Reference Verification & Authenticity Audit</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Cited Publication Title</th>
+                        <th>Authors</th>
+                        <th style="width: 70px;">Year</th>
+                        <th>DOI / Link</th>
+                        <th style="width: 140px;">Status</th>
+                        <th>Registry Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+            for r in references[:50]:
+                r_num = getattr(r, "ref_number", "-")
+                r_title = sanitize_for_display(getattr(r, "title", "")[:70])
+                r_authors = sanitize_for_display(getattr(r, "authors", "")[:35])
+                r_year = getattr(r, "year", "-")
+                r_doi = getattr(r, "doi", "") or getattr(r, "url", "") or "-"
+                r_status = getattr(r, "status", "NOT VERIFIED")
+                r_notes = sanitize_for_display(getattr(r, "difference_notes", "") or getattr(r, "verification_source", ""))
+                
+                badge_class = "badge-exact" if r_status in ["BROKEN LINK", "SUSPICIOUS"] else ("badge-quote" if r_status == "VERIFIED" else "badge-fuzzy")
+
+                html_content += f"""
+                    <tr>
+                        <td>#{r_num}</td>
+                        <td><strong>{r_title}</strong></td>
+                        <td>{r_authors}</td>
+                        <td>{r_year}</td>
+                        <td><code>{sanitize_for_display(r_doi[:35])}</code></td>
+                        <td><span class="badge {badge_class}">{r_status}</span></td>
+                        <td><small>{r_notes}</small></td>
+                    </tr>
+"""
+            html_content += """
+                </tbody>
+            </table>
+        </div>
+"""
+
+        # Citation Issues Section if available
+        if citation_issues:
+            html_content += """
+        <div class="table-section">
+            <h2 class="section-title">In-Text Citation Anomalies & Reference Discrepancies</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 160px;">Anomaly Category</th>
+                        <th style="width: 120px;">Citation Text</th>
+                        <th style="width: 60px;">Page</th>
+                        <th>Audit Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+            for ci in citation_issues:
+                html_content += f"""
+                    <tr>
+                        <td><span class="badge badge-exact">{sanitize_for_display(getattr(ci, 'issue_type', 'Anomaly'))}</span></td>
+                        <td><strong>{sanitize_for_display(getattr(ci, 'citation_text', '-'))}</strong></td>
+                        <td>Pg {getattr(ci, 'page_number', 1)}</td>
+                        <td>{sanitize_for_display(getattr(ci, 'details', ''))}</td>
+                    </tr>
+"""
+            html_content += """
+                </tbody>
+            </table>
+        </div>
+"""
+
+        html_content += f"""
         <div class="footer">
             ResearchGuard Academic Systems &bull; Standard Verification Engine &bull; Confidential
         </div>

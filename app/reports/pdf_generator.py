@@ -162,6 +162,7 @@ class PDFReportGenerator:
         citation_data: Optional[Dict] = None,
         structure_data: Optional[Dict] = None,
         metadata: Optional[Dict] = None,
+        references: Optional[List] = None,
     ) -> Path:
         """Builds and compiles the official institutional certificate and multi-page audit report."""
         logger.info(f"Generating IMRD Clearance Certificate at: {self.output_path}")
@@ -491,6 +492,37 @@ class PDFReportGenerator:
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ]))
         elements.append(t_matches)
+
+        # Bibliography Reference Verification Audit Table
+        if references:
+            elements.append(Spacer(1, 14))
+            elements.append(Paragraph("Bibliography Reference Verification & Authenticity Audit", self.heading2_style))
+            ref_headers = [["#", "Cited Title", "Authors", "Year", "DOI / Link", "Status"]]
+            ref_rows = []
+            for r in references[:30]:
+                r_num = str(getattr(r, "ref_number", "-"))
+                r_title = getattr(r, "title", "")[:45]
+                r_authors = getattr(r, "authors", "")[:25]
+                r_year = str(getattr(r, "year", "-"))
+                r_doi = getattr(r, "doi", "") or getattr(r, "url", "") or "-"
+                if len(r_doi) > 30:
+                    r_doi = r_doi[:27] + "..."
+                r_status = getattr(r, "status", "NOT VERIFIED")
+                ref_rows.append([r_num, r_title, r_authors, r_year, r_doi, r_status])
+
+            if ref_rows:
+                t_refs = Table(ref_headers + ref_rows, colWidths=[0.35 * inch, 2.9 * inch, 1.4 * inch, 0.55 * inch, 1.35 * inch, 1.0 * inch])
+                t_refs.setStyle(TableStyle([
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0284C7")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, -1), 7.5),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                    ("TOPPADDING", (0, 0), (-1, -1), 4),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ]))
+                elements.append(t_refs)
 
         # Build PDF document
         doc.build(elements)
