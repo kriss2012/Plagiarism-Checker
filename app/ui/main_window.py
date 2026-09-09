@@ -66,6 +66,13 @@ class MainWindow(QMainWindow):
         self._init_ui()
         self._apply_theme()
 
+        # Start engine status polling
+        from PySide6.QtCore import QTimer
+        self.engine_status_timer = QTimer(self)
+        self.engine_status_timer.timeout.connect(self._update_engine_status)
+        self.engine_status_timer.start(2000)
+        self._update_engine_status()
+
     def _init_ui(self):
         # 1. Native Windows Menu Bar
         self._create_menu_bar()
@@ -308,9 +315,14 @@ class MainWindow(QMainWindow):
         layout.addStretch()
 
         # Engine status indicator pill
-        status_pill = QLabel("● Engine Ready")
-        status_pill.setObjectName("statusPill")
-        layout.addWidget(status_pill)
+        self.status_pill = QLabel("● Engine Starting...")
+        self.status_pill.setObjectName("statusPill")
+        self.status_pill.setProperty("state", "loading")
+        self.status_pill.setToolTip(
+            "Verification Engine Status: NLP model has not been loaded into memory yet."
+        )
+        self.status_pill.setAccessibleName("Verification engine status")
+        layout.addWidget(self.status_pill)
 
         return hdr
 
@@ -421,76 +433,91 @@ class MainWindow(QMainWindow):
         from dataclasses import dataclass
         from app.core.scoring import ScoreBreakdown
 
-        with get_db() as session:
-            doc = session.query(Document).filter_by(id=doc_id).first()
-            if not doc:
-                return
+        try:
+            with get_db() as session:
+                doc = session.query(Document).filter_by(id=doc_id).first()
+                if not doc:
+                    from PySide6.QtWidgets import QMessageBox
+                    QMessageBox.warning(
+                        self, "Record Not Found",
+                        f"Student verification record #{doc_id} could not be found in the database."
+                    )
+                    return
 
-            matches = [m.to_dict() for m in doc.matches]
+                matches = [m.to_dict() for m in doc.matches]
 
-            sb = ScoreBreakdown(
-                overall_similarity=doc.overall_similarity,
-                risk_level=doc.risk_level,
-                exact_percentage=round((doc.exact_matches_count / max(1, doc.word_count)) * 100, 1),
-                fuzzy_percentage=round((doc.fuzzy_matches_count / max(1, doc.word_count)) * 100, 1),
-                semantic_percentage=round((doc.semantic_matches_count / max(1, doc.word_count)) * 100, 1),
-                quoted_percentage=round((doc.quoted_matches_count / max(1, doc.word_count)) * 100, 1),
-                total_analyzed_words=doc.word_count,
-                matched_words=0,
-                exact_count=doc.exact_matches_count,
-                fuzzy_count=doc.fuzzy_matches_count,
-                semantic_count=doc.semantic_matches_count,
-                quoted_count=doc.quoted_matches_count,
-                ignored_count=0,
-                explanation="",
+                sb = ScoreBreakdown(
+                    overall_similarity=doc.overall_similarity,
+                    risk_level=doc.risk_level,
+                    exact_percentage=round((doc.exact_matches_count / max(1, doc.word_count)) * 100, 1),
+                    fuzzy_percentage=round((doc.fuzzy_matches_count / max(1, doc.word_count)) * 100, 1),
+                    semantic_percentage=round((doc.semantic_matches_count / max(1, doc.word_count)) * 100, 1),
+                    quoted_percentage=round((doc.quoted_matches_count / max(1, doc.word_count)) * 100, 1),
+                    total_analyzed_words=doc.word_count,
+                    matched_words=0,
+                    exact_count=doc.exact_matches_count,
+                    fuzzy_count=doc.fuzzy_matches_count,
+                    semantic_count=doc.semantic_matches_count,
+                    quoted_count=doc.quoted_matches_count,
+                    ignored_count=0,
+                    explanation="",
+                )
+
+                class SavedResult:
+                    pass
+
+                res = SavedResult()
+                res.document_filename = doc.filename
+                res.file_hash = doc.hash
+                res.word_count = doc.word_count
+                res.page_count = doc.page_count
+                res.extracted_text = doc.extracted_text or ""
+                res.score_breakdown = sb
+                res.matches = matches
+
+                # Student metadata
+                res.student_name = doc.student_name or "Student"
+                res.prn_number = doc.prn_number or "-"
+                res.course_name = doc.course_name or "MCA"
+                res.academic_year = doc.academic_year or "2025-2026"
+                res.semester = doc.semester or "Semester IV"
+                res.guide_name = doc.guide_name or "-"
+                res.paper_title = doc.paper_title or doc.filename
+                res.clearance_status = doc.clearance_status or "Approved (Level 0)"
+                res.certificate_no = doc.certificate_no or f"IMRD/LIB/{doc.id:04d}"
+
+                try:
+                    res.structure = json.loads(doc.structure_json) if doc.structure_json else {}
+                except Exception:
+                    res.structure = {}
+
+                @dataclass
+                class MockCit:
+                    citation_count: int = 0
+                    reference_count: int = 0
+                    quotes: list = None
+                    uncited_claims: int = 0
+
+                res.citations = MockCit(quotes=[])
+
+                @dataclass
+                class MockAI:
+                    likelihood: str = "Low"
+                    score: float = 10.0
+
+                res.ai_writing = MockAI(likelihood=doc.ai_likelihood or "Low")
+
+                self.view_results.load_result(res, doc_id)
+                self._navigate_to(3)
+
+        except Exception as e:
+            from app.utils.logger import logger
+            from PySide6.QtWidgets import QMessageBox
+            logger.error(f"Failed to load document {doc_id} into results: {e}", exc_info=True)
+            QMessageBox.critical(
+                self, "Load Error",
+                f"Could not load the student verification record:\n{e}"
             )
-
-            class SavedResult:
-                pass
-
-            res = SavedResult()
-            res.document_filename = doc.filename
-            res.file_hash = doc.hash
-            res.word_count = doc.word_count
-            res.page_count = doc.page_count
-            res.extracted_text = doc.extracted_text or ""
-            res.score_breakdown = sb
-            res.matches = matches
-
-            # Student metadata
-            res.student_name = doc.student_name or "Student"
-            res.prn_number = doc.prn_number or "-"
-            res.course_name = doc.course_name or "MCA"
-            res.academic_year = doc.academic_year or "2025-2026"
-            res.semester = doc.semester or "Semester IV"
-            res.guide_name = doc.guide_name or "-"
-            res.paper_title = doc.paper_title or doc.filename
-            res.clearance_status = doc.clearance_status or "Approved (Level 0)"
-            res.certificate_no = doc.certificate_no or f"IMRD/LIB/{doc.id:04d}"
-
-            try:
-                res.structure = json.loads(doc.structure_json) if doc.structure_json else {}
-            except Exception:
-                res.structure = {}
-
-            @dataclass
-            class MockCit:
-                citation_count: int = 0
-                reference_count: int = 0
-                quotes: list = None
-                uncited_claims: int = 0
-
-            res.citations = MockCit(quotes=[])
-
-            @dataclass
-            class MockAI:
-                likelihood: str = "Low"
-                score: float = 10.0
-
-            res.ai_writing = MockAI(likelihood=doc.ai_likelihood or "Low")
-
-            self.view_results.load_result(res, doc_id)
-            self._navigate_to(3)
 
     def _check_database_integrity(self):
         with get_db() as session:
@@ -502,6 +529,27 @@ class MainWindow(QMainWindow):
             f"• Verified Student Records: {count}\n"
             f"• Schema: IMRD Shirpur Academic Integrity Standard v1.0",
         )
+
+    def _update_engine_status(self):
+        from app.ml.semantic import get_model_status_text, is_semantic_model_available
+        status_text = get_model_status_text()
+        
+        if is_semantic_model_available():
+            self.status_pill.setText(f"● {status_text}")
+            self.status_pill.setProperty("state", "ready")
+            self.status_pill.setToolTip("Verification Engine Status: Local NLP model is active and running entirely on this workstation.")
+        elif "Offline" in status_text or "Heuristic" in status_text:
+            self.status_pill.setText("● Offline/Heuristic")
+            self.status_pill.setProperty("state", "offline")
+            self.status_pill.setToolTip("Verification Engine Status: Local NLP model unavailable. Running in lightweight fallback mode.")
+        else:
+            self.status_pill.setText("● Model Unloaded")
+            self.status_pill.setProperty("state", "loading")
+            self.status_pill.setToolTip("Verification Engine Status: NLP model has not been loaded into memory yet.")
+        
+        # Force re-evaluation of stylesheet
+        self.status_pill.style().unpolish(self.status_pill)
+        self.status_pill.style().polish(self.status_pill)
 
     def _show_about_dialog(self):
         QMessageBox.about(

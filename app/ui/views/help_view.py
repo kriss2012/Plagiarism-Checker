@@ -44,7 +44,7 @@ class HelpView(QWidget):
         # Header
         h_box = QVBoxLayout()
         title = QLabel(f"{INSTITUTION_SHORT} Central Library • Plagiarism Verification SOP & Guidelines")
-        title.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        title.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
         sub = QLabel(f"{INSTITUTION_NAME} • {AFFILIATION_TEXT} • System v{APP_VERSION}")
         sub.setStyleSheet("font-size: 12px; color: #64748B;")
         h_box.addWidget(title)

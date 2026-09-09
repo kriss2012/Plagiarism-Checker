@@ -196,9 +196,10 @@ class SourceLibraryView(QWidget):
         for i in range(1, 6):
             self.table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Fixed)
-        self.table.setColumnWidth(6, 90)
+        self.table.setColumnWidth(6, 100)
         self.table.horizontalHeader().setMinimumSectionSize(75)
         self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setDefaultSectionSize(40)
         self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         layout.addWidget(self.table)
 
@@ -224,6 +225,7 @@ class SourceLibraryView(QWidget):
                 self.empty_state.setVisible(False)
                 self.table.setRowCount(len(sources))
                 for r_idx, s in enumerate(sources):
+                    self.table.setRowHeight(r_idx, 38)
                     self.table.setItem(r_idx, 0, QTableWidgetItem(s.title))
                     self.table.setItem(r_idx, 1, QTableWidgetItem(s.author or "Unknown"))
                     self.table.setItem(r_idx, 2, QTableWidgetItem(str(s.publication_year or "-")))
@@ -233,13 +235,18 @@ class SourceLibraryView(QWidget):
 
                     del_btn = QPushButton("Delete")
                     del_btn.setObjectName("dangerBtn")
-                    del_btn.setFixedHeight(24)
-                    del_btn.setStyleSheet("font-size: 11px; padding: 2px 8px;")
                     del_btn.setCursor(Qt.PointingHandCursor)
                     del_btn.clicked.connect(lambda chk=False, s_id=s.id: self._delete_source(s_id))
-                    self.table.setCellWidget(r_idx, 6, del_btn)
-        except Exception:
-            pass
+
+                    del_box = QWidget()
+                    del_box.setStyleSheet("background: transparent;")
+                    del_layout = QHBoxLayout(del_box)
+                    del_layout.setContentsMargins(6, 2, 6, 2)
+                    del_layout.setAlignment(Qt.AlignCenter)
+                    del_layout.addWidget(del_btn)
+                    self.table.setCellWidget(r_idx, 6, del_box)
+        except Exception as e:
+            logger.error(f"Failed to load reference source library: {e}", exc_info=True)
 
     def _open_add_dialog(self):
         dlg = AddSourceDialog(self)

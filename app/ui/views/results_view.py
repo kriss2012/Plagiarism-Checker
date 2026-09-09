@@ -86,6 +86,7 @@ class ResultsView(QWidget):
         self.export_cert_btn = QPushButton("Print Clearance Certificate (PDF)")
         self.export_cert_btn.setObjectName("certBtn")
         self.export_cert_btn.setFixedHeight(34)
+        self.export_cert_btn.setMinimumWidth(210)
         self.export_cert_btn.setCursor(Qt.PointingHandCursor)
         self.export_cert_btn.clicked.connect(self._export_pdf)
         h_layout.addWidget(self.export_cert_btn)
@@ -93,12 +94,14 @@ class ResultsView(QWidget):
         self.inspect_btn = QPushButton("Inspect Matches")
         self.inspect_btn.setObjectName("primaryBtn")
         self.inspect_btn.setFixedHeight(34)
+        self.inspect_btn.setMinimumWidth(120)
         self.inspect_btn.setCursor(Qt.PointingHandCursor)
         self.inspect_btn.clicked.connect(self._on_inspect_clicked)
         h_layout.addWidget(self.inspect_btn)
 
         self.export_html_btn = QPushButton("HTML Audit Report")
         self.export_html_btn.setFixedHeight(34)
+        self.export_html_btn.setMinimumWidth(140)
         self.export_html_btn.setCursor(Qt.PointingHandCursor)
         self.export_html_btn.clicked.connect(self._export_html)
         h_layout.addWidget(self.export_html_btn)
@@ -314,20 +317,36 @@ class ResultsView(QWidget):
             struct_lines.append(f"<font color='{color}'><b>{mark} {name}:</b> {status}</font>")
         self.structure_text.setText("<br/>".join(struct_lines))
 
-        # Update Citations text
+        # Update Citations text — with correct pluralization
         cit = result_obj.citations
         ai = result_obj.ai_writing
         ai_lik = getattr(ai, "likelihood", "Low")
         ai_score = getattr(ai, "score", 0.0)
 
-        cit_html = f"""
-            <b>In-Text Citations:</b> {cit.citation_count} parsed (IEEE, APA, Harvard)<br/>
-            <b>References Count:</b> {cit.reference_count} bibliographic entries<br/>
-            <b>Quoted Passages:</b> {len(cit.quotes)} sections isolated<br/>
-            <b>Potentially Uncited Sections:</b> {cit.uncited_claims} paragraphs<br/><br/>
-            <b>AI Writing Likelihood:</b> <font color='#005FEA'><b>{ai_lik} ({ai_score:.0f}%)</b></font><br/>
-            <font size='1' color='#64748B'>*Evaluated via stylometric sentence-length variance and burstiness.</font>
-        """
+        def _pl(n: int, singular: str, plural: str = "") -> str:
+            """Return correctly pluralized unit string."""
+            if not plural:
+                plural = singular + "s"
+            return singular if n == 1 else plural
+
+        quote_count = len(cit.quotes) if cit.quotes else 0
+        uncited = cit.uncited_claims
+
+        cit_html = (
+            f"<b>In-Text Citations:</b> {cit.citation_count} "
+            f"{_pl(cit.citation_count, 'citation')} parsed (IEEE, APA, Harvard)<br/>"
+            f"<b>References Count:</b> {cit.reference_count} bibliographic "
+            f"{_pl(cit.reference_count, 'entry', 'entries')}<br/>"
+            f"<b>Quoted Passages:</b> {quote_count} "
+            f"{_pl(quote_count, 'section')} isolated<br/>"
+            f"<b>Potentially Uncited Sections:</b> {uncited} "
+            f"{_pl(uncited, 'paragraph')}<br/><br/>"
+            f"<b>AI Writing Likelihood:</b> "
+            f"<font color='#005FEA'><b>{ai_lik} ({ai_score:.0f}%)</b></font><br/>"
+            f"<font color='#64748B'><i>Note: This score is an indicative heuristic based on "
+            f"stylometric variance analysis and does not constitute definitive proof "
+            f"of AI-generated content.</i></font>"
+        )
         self.citations_text.setText(cit_html)
 
     def _on_inspect_clicked(self):
@@ -422,6 +441,11 @@ class ResultsView(QWidget):
 
     def _export_html(self):
         if not self._current_result:
+            QMessageBox.warning(
+                self,
+                "No Document Loaded",
+                "Please verify a student document before generating an audit report.",
+            )
             return
 
         filename_clean = Path(self._current_result.document_filename).stem

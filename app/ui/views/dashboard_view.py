@@ -151,6 +151,7 @@ class DashboardView(QWidget):
 
         self.refresh_btn = QPushButton("Refresh")
         self.refresh_btn.setFixedHeight(28)
+        self.refresh_btn.setToolTip("Reload dashboard metrics and recent verifications")
         self.refresh_btn.setCursor(Qt.PointingHandCursor)
         self.refresh_btn.clicked.connect(self.refresh_data)
         tbl_hdr.addWidget(self.refresh_btn)
@@ -167,11 +168,13 @@ class DashboardView(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
-        self.table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(5, QHeaderView.Fixed)
+        self.table.setColumnWidth(5, 160)
         self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Fixed)
-        self.table.setColumnWidth(6, 92)
+        self.table.setColumnWidth(6, 110)
         self.table.horizontalHeader().setMinimumSectionSize(75)
         self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setDefaultSectionSize(40)
         self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.table.setMinimumHeight(120)
@@ -186,6 +189,16 @@ class DashboardView(QWidget):
         )
         self.empty_state.setVisible(False)
         self.table_box.addWidget(self.empty_state)
+
+        # Error State
+        self.error_state = EmptyStateWidget(
+            title="Dashboard Data Unavailable",
+            message="An error occurred while loading the dashboard metrics. Please check the logs and try again.",
+            action_text="Retry Loading Data",
+            action_callback=self.refresh_data,
+        )
+        self.error_state.setVisible(False)
+        self.table_box.addWidget(self.error_state)
 
         main_layout.addWidget(self.table_card)
 
@@ -248,14 +261,20 @@ class DashboardView(QWidget):
             if not recent:
                 self.table.setVisible(False)
                 self.empty_state.setVisible(True)
+                self.error_state.setVisible(False)
             else:
                 self.table.setVisible(True)
                 self.empty_state.setVisible(False)
+                self.error_state.setVisible(False)
                 self.table.setRowCount(len(recent))
-                # Adjust table height dynamically to fit rows cleanly without excessive space
-                self.table.setFixedHeight(min(300, 36 + len(recent) * 36))
+                row_h = 40
+                header_h = self.table.horizontalHeader().height() or 34
+                desired_h = min(360, header_h + len(recent) * row_h + 6)
+                self.table.setMinimumHeight(desired_h)
+                self.table.setMaximumHeight(desired_h)
 
                 for row_idx, doc in enumerate(recent):
+                    self.table.setRowHeight(row_idx, row_h)
                     self.table.setItem(row_idx, 0, QTableWidgetItem(doc.get("prn_number") or "-"))
                     name = doc.get("student_name") or doc["filename"]
                     self.table.setItem(row_idx, 1, QTableWidgetItem(name))
@@ -283,20 +302,39 @@ class DashboardView(QWidget):
                         color: {fg};
                         border: 1px solid {border};
                         border-radius: 4px;
-                        font-size: 10px;
+                        font-size: 11px;
                         font-weight: 700;
-                        padding: 3px 6px;
+                        padding: 3px 10px;
+                        min-height: 20px;
+                        max-height: 24px;
                     """)
-                    self.table.setCellWidget(row_idx, 5, badge)
+                    badge_box = QWidget()
+                    badge_box.setStyleSheet("background: transparent;")
+                    badge_layout = QHBoxLayout(badge_box)
+                    badge_layout.setContentsMargins(6, 2, 6, 2)
+                    badge_layout.setAlignment(Qt.AlignCenter)
+                    badge_layout.addWidget(badge)
+                    self.table.setCellWidget(row_idx, 5, badge_box)
 
                     view_btn = QPushButton("Certificate")
                     view_btn.setObjectName("certBtn")
-                    view_btn.setFixedHeight(24)
-                    view_btn.setStyleSheet("padding: 2px 8px; font-size: 11px;")
                     view_btn.setCursor(Qt.PointingHandCursor)
+                    student_name_label = doc.get("student_name") or doc["filename"]
+                    view_btn.setToolTip(f"View verification results for {student_name_label}")
+                    view_btn.setAccessibleName(f"View certificate for {student_name_label}")
                     view_btn.clicked.connect(lambda chk=False, d_id=doc["id"]: self.view_document_requested.emit(d_id))
-                    self.table.setCellWidget(row_idx, 6, view_btn)
 
-        except Exception:
-            pass
+                    btn_box = QWidget()
+                    btn_box.setStyleSheet("background: transparent;")
+                    btn_layout = QHBoxLayout(btn_box)
+                    btn_layout.setContentsMargins(6, 2, 6, 2)
+                    btn_layout.setAlignment(Qt.AlignCenter)
+                    btn_layout.addWidget(view_btn)
+                    self.table.setCellWidget(row_idx, 6, btn_box)
 
+        except Exception as e:
+            from app.utils.logger import logger
+            logger.error(f"Failed to refresh dashboard data: {e}", exc_info=True)
+            self.table.setVisible(False)
+            self.empty_state.setVisible(False)
+            self.error_state.setVisible(True)

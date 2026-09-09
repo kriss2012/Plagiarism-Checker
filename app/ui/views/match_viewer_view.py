@@ -40,8 +40,10 @@ class MatchViewerView(QWidget):
 
         # Top Header Bar
         top_bar = QHBoxLayout()
-        self.back_btn = QPushButton("◀ Back to Summary")
+        self.back_btn = QPushButton("◄ Back to Summary")
         self.back_btn.setFixedHeight(34)
+        self.back_btn.setToolTip("Return to the similarity results and certificate summary")
+        self.back_btn.setAccessibleName("Back to similarity summary")
         self.back_btn.clicked.connect(self.back_to_results.emit)
         top_bar.addWidget(self.back_btn)
 
@@ -54,13 +56,17 @@ class MatchViewerView(QWidget):
         self.match_counter_lbl.setStyleSheet("color: #475569; font-weight: 600;")
         top_bar.addWidget(self.match_counter_lbl)
 
-        self.prev_btn = QPushButton("◀ Previous")
+        self.prev_btn = QPushButton("◄ Previous")
         self.prev_btn.setFixedHeight(34)
+        self.prev_btn.setToolTip("Go to the previous match")
+        self.prev_btn.setAccessibleName("Previous match")
         self.prev_btn.clicked.connect(self._prev_match)
         top_bar.addWidget(self.prev_btn)
 
-        self.next_btn = QPushButton("Next ▶")
+        self.next_btn = QPushButton("Next ►")
         self.next_btn.setFixedHeight(34)
+        self.next_btn.setToolTip("Go to the next match")
+        self.next_btn.setAccessibleName("Next match")
         self.next_btn.clicked.connect(self._next_match)
         top_bar.addWidget(self.next_btn)
 

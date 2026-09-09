@@ -72,7 +72,7 @@ class NewCheckView(QWidget):
         # 1. Header Banner
         header_box = QVBoxLayout()
         h_title = QLabel("Student Dissertation & Research Paper Verification Intake")
-        h_title.setStyleSheet("font-size: 19px; font-weight: 800; color: #002461;")
+        h_title.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
         h_sub = QLabel(
             f"Central Library • {INSTITUTION_SHORT} • Plagiarism Verification & UGC Compliance Clearance System"
         )
@@ -184,11 +184,16 @@ class NewCheckView(QWidget):
             "File Name", "Size", "Pages", "Word Count", "Status", "Action"
         ])
         self.queue_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        for c in range(1, 6):
+        for c in range(1, 5):
             self.queue_table.horizontalHeader().setSectionResizeMode(c, QHeaderView.ResizeToContents)
+        self.queue_table.horizontalHeader().setSectionResizeMode(5, QHeaderView.Fixed)
+        self.queue_table.setColumnWidth(5, 105)
         self.queue_table.verticalHeader().setVisible(False)
-        self.queue_table.setMinimumHeight(95)
-        self.queue_table.setMaximumHeight(160)
+        self.queue_table.verticalHeader().setDefaultSectionSize(40)
+        self.queue_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.queue_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.queue_table.setMinimumHeight(100)
+        self.queue_table.setMaximumHeight(180)
         f_layout.addWidget(self.queue_table)
 
         layout.addWidget(file_card)
@@ -337,6 +342,7 @@ class NewCheckView(QWidget):
     def _refresh_queue_table(self):
         self.queue_table.setRowCount(len(self._queue))
         for idx, item in enumerate(self._queue):
+            self.queue_table.setRowHeight(idx, 38)
             self.queue_table.setItem(idx, 0, QTableWidgetItem(item["filename"]))
             self.queue_table.setItem(idx, 1, QTableWidgetItem(item["size"]))
             self.queue_table.setItem(idx, 2, QTableWidgetItem(str(item["pages"])))
@@ -345,10 +351,16 @@ class NewCheckView(QWidget):
 
             rm_btn = QPushButton("Remove")
             rm_btn.setObjectName("dangerBtn")
-            rm_btn.setFixedHeight(24)
             rm_btn.setCursor(Qt.PointingHandCursor)
             rm_btn.clicked.connect(lambda chk=False, row=idx: self._remove_from_queue(row))
-            self.queue_table.setCellWidget(idx, 5, rm_btn)
+
+            btn_box = QWidget()
+            btn_box.setStyleSheet("background: transparent;")
+            btn_layout = QHBoxLayout(btn_box)
+            btn_layout.setContentsMargins(6, 2, 6, 2)
+            btn_layout.setAlignment(Qt.AlignCenter)
+            btn_layout.addWidget(rm_btn)
+            self.queue_table.setCellWidget(idx, 5, btn_box)
 
     def _remove_from_queue(self, row: int):
         if 0 <= row < len(self._queue):
@@ -469,7 +481,7 @@ class NewCheckView(QWidget):
         self.analysis_completed.emit((result, doc_id))
 
     def _on_worker_failed(self, err_msg: str):
-        self.status_lbl.setText(f"Verification failed: {err_msg}")
+        self.status_lbl.setText(f"⚠ Verification failed: {err_msg}")
         self.analyze_btn.setEnabled(True)
         self.cancel_btn.setVisible(False)
         if self._queue:
