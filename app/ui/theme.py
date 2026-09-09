@@ -17,6 +17,10 @@ QWidget {
     selection-color: #ffffff;
 }
 
+QLabel {
+    background: transparent;
+}
+
 QMainWindow {
     background-color: #f3f8f9;
 }
@@ -262,8 +266,9 @@ QPushButton.danger:pressed, QPushButton#dangerBtn:pressed {
 /* ==================== COMPACT TABLE BUTTONS ==================== */
 QTableWidget QPushButton, QPushButton.tableBtn, QPushButton#tableBtn {
     min-height: 24px;
-    max-height: 26px;
-    padding: 2px 10px;
+    max-height: 28px;
+    min-width: 72px;
+    padding: 2px 8px;
     font-size: 11px;
     font-weight: 600;
     border-radius: 4px;
@@ -271,8 +276,9 @@ QTableWidget QPushButton, QPushButton.tableBtn, QPushButton#tableBtn {
 
 QTableWidget QPushButton#certBtn, QPushButton#certBtn.tableBtn {
     min-height: 24px;
-    max-height: 26px;
-    padding: 2px 12px;
+    max-height: 28px;
+    min-width: 80px;
+    padding: 2px 10px;
     font-size: 11px;
     font-weight: 700;
     border-radius: 4px;
@@ -292,8 +298,9 @@ QTableWidget QPushButton#certBtn:pressed, QPushButton#certBtn.tableBtn:pressed {
 
 QTableWidget QPushButton#dangerBtn, QPushButton#dangerBtn.tableBtn {
     min-height: 24px;
-    max-height: 26px;
-    padding: 2px 10px;
+    max-height: 28px;
+    min-width: 72px;
+    padding: 2px 8px;
     font-size: 11px;
     font-weight: 600;
     border-radius: 4px;
