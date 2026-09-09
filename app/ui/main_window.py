@@ -63,6 +63,7 @@ class MainWindow(QMainWindow):
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
 
+        self._active_theme = "light"
         self._init_ui()
         self._apply_theme()
 
@@ -72,6 +73,19 @@ class MainWindow(QMainWindow):
         self.engine_status_timer.timeout.connect(self._update_engine_status)
         self.engine_status_timer.start(2000)
         self._update_engine_status()
+
+    def _apply_theme(self):
+        """Applies the current active stylesheet to the application window."""
+        from app.ui.theme import RCPIMRD_THEME
+        self.setStyleSheet(RCPIMRD_THEME)
+
+    def _toggle_theme(self):
+        """Toggles between light and dark themes."""
+        if self._active_theme == "light":
+            self._active_theme = "dark"
+        else:
+            self._active_theme = "light"
+        self._apply_theme()
 
     def _init_ui(self):
         # 1. Native Windows Menu Bar
