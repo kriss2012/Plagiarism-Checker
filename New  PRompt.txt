@@ -1,0 +1,844 @@
+# FIX EXISTING PLAGIARISM CHECKER — DO NOT REBUILD
+
+I have an existing Python plagiarism/research-paper verification project.
+
+Project path:
+
+D:\Programs\Plagiarism-Checker
+
+I ran:
+
+python -m pytest tests/test_verification_scenarios.py -v
+
+Current result:
+
+* 12 tests collected
+* 10 PASSED
+* 2 FAILED
+
+Current failures:
+
+1. test_3_copied_paragraph_with_citation
+2. test_6_common_academic_language
+
+Your job is to inspect the EXISTING codebase and fix these failures correctly.
+
+## CRITICAL RULE
+
+DO NOT rebuild the application from scratch.
+
+DO NOT replace the plagiarism engine with a new implementation.
+
+DO NOT modify tests just to make them pass.
+
+DO NOT hard-code test-specific values.
+
+DO NOT remove assertions.
+
+DO NOT weaken the existing detection system.
+
+Fix the underlying implementation so the behavior is logically correct and all 12 tests pass.
+
+After fixing the two failures, run the complete test suite again.
+
+---
+
+# CURRENT FAILURE 1
+
+Test:
+
+test_3_copied_paragraph_with_citation
+
+The test creates:
+
+source_sentence = (
+"Convolutional neural networks achieve state-of-the-art performance in complex radiological pattern identification."
+)
+
+paper_text:
+
+"Convolutional neural networks achieve state-of-the-art performance in complex radiological pattern identification. [1]"
+
+Source:
+
+ComparisonSource(
+source_id=3,
+name="RadNet 2022",
+text=source_sentence,
+sentences=[source_sentence],
+)
+
+The engine is:
+
+PlagiarismDetectionEngine(settings={"enable_web_search": False})
+
+Expected:
+
+assert len(result.matches) >= 1
+
+Actual:
+
+len(result.matches) == 0
+
+The log says:
+
+"Comparing 1 sentences against 1 source sentences."
+
+But the result contains:
+
+matches=[]
+
+and:
+
+overall_similarity=0.0
+exact_percentage=0.0
+fuzzy_percentage=0.0
+semantic_percentage=0.0
+matched_words=0
+exact_count=0
+fuzzy_count=0
+semantic_count=0
+
+while:
+
+citation_coverage_score=100.0
+reference_verification_score=100.0
+
+The sentence extractor correctly produced:
+
+original_text:
+"Convolutional neural networks achieve state-of-the-art performance in complex radiological pattern identification."
+
+normalized_text:
+"convolutional neural networks achieve state of the art performance in complex radiological pattern identification"
+
+Therefore the document parsing itself appears correct.
+
+---
+
+# ROOT LOGIC THAT MUST BE IMPLEMENTED
+
+A citation does NOT mean that a textual similarity match does not exist.
+
+The system must distinguish:
+
+SIMILARITY DETECTION
+
+from
+
+PLAGIARISM RISK CLASSIFICATION
+
+These are two separate stages.
+
+For this test:
+
+The sentence is copied exactly from the comparison source.
+
+Therefore:
+
+1. The engine MUST detect the exact match.
+2. The engine MUST create a Match object.
+3. The match MUST remain in result.matches.
+4. The citation [1] should affect the risk/classification of the match.
+5. Citation coverage can reduce the plagiarism risk.
+6. Citation must NOT erase the underlying similarity evidence.
+
+In other words:
+
+WRONG:
+
+if sentence_is_cited:
+don't_create_match()
+
+CORRECT:
+
+match = detect_similarity(sentence, source)
+
+if match:
+match.citation_status = ...
+match.risk_level = ...
+result.matches.append(match)
+
+Citation awareness happens AFTER similarity detection.
+
+---
+
+# FIX FAILURE 1
+
+Inspect the complete flow around:
+
+* PlagiarismDetectionEngine
+* analyze_document()
+* sentence comparison
+* exact matching
+* fuzzy matching
+* semantic matching
+* citation detection
+* match filtering
+* ignored/common phrase filtering
+* risk classification
+
+Find exactly where a cited sentence is being excluded.
+
+Potential problematic logic may look conceptually like:
+
+if sentence.is_cited:
+continue
+
+or:
+
+if is_cited(sentence):
+return None
+
+or:
+
+if citation_coverage:
+suppress_match()
+
+Remove/fix that behavior.
+
+A cited sentence should still produce a similarity Match.
+
+---
+
+# CITATION-AWARE CLASSIFICATION
+
+Implement logic similar to:
+
+1. Detect similarity.
+2. Determine whether the sentence is cited.
+3. Determine whether it is quoted.
+4. Determine whether the reference exists.
+5. Determine source confidence.
+6. Classify the match.
+
+For example:
+
+EXACT MATCH + NO CITATION
+→ HIGH-RISK / UNATTRIBUTED
+
+EXACT MATCH + CITATION
+→ MATCH DETECTED + CITED
+
+EXACT MATCH + CITATION + QUOTATION
+→ MATCH DETECTED + PROPERLY ATTRIBUTED / LOW RISK
+
+PARAPHRASE + CITATION
+→ SEMANTIC MATCH + CITED
+
+PARAPHRASE + NO CITATION
+→ HIGHER RISK
+
+The exact labels should follow the existing project's data model if one already exists.
+
+Do not invent unnecessary new APIs or structures if equivalent structures already exist.
+
+---
+
+# IMPORTANT
+
+The test specifically expects:
+
+len(result.matches) >= 1
+
+Therefore the detected match must be retained even if it is properly cited.
+
+The score/risk may be low because it is cited, but the match evidence must still exist.
+
+Example:
+
+Match:
+source_id = 3
+
+match_type:
+EXACT
+
+similarity:
+100%
+
+citation_status:
+CITED
+
+risk:
+LOW / CITED
+
+This is the correct academic behavior.
+
+---
+
+# CITATION DETECTION
+
+The current preprocessed sentence shown in the failure contains:
+
+is_cited=False
+
+even though the original document contains:
+
+[1]
+
+Notice that the extracted sentence itself ends before "[1]":
+
+Sentence:
+
+"Convolutional neural networks achieve state-of-the-art performance in complex radiological pattern identification."
+
+Original full text:
+
+"... identification. [1]"
+
+This may mean citation detection is being performed only on the sentence text rather than the surrounding document context.
+
+Inspect the existing citation detector.
+
+It should correctly associate trailing citations with the preceding sentence.
+
+Examples that should be recognized:
+
+Sentence [1]
+
+Sentence. [1]
+
+Sentence [1,2]
+
+Sentence. [1, 2]
+
+Sentence (Smith, 2024)
+
+Sentence. (Smith et al., 2024)
+
+Sentence [3–5]
+
+Do this without breaking existing citation detection tests.
+
+If the architecture stores citation information separately from SentenceUnit, use the existing architecture rather than duplicating state.
+
+---
+
+# DO NOT SIMPLY SET is_cited=True
+
+Do not solve this failure by hardcoding the test sentence or setting every sentence to cited.
+
+Actually implement correct citation association.
+
+The citation:
+
+[1]
+
+should be associated with the preceding sentence/paragraph according to normal academic citation placement.
+
+---
+
+# FAILURE 2
+
+Test:
+
+test_6_common_academic_language
+
+The test uses:
+
+"In this study, the results indicate that the experimental hypothesis is validated."
+
+"The purpose of this research is to investigate the parameters."
+
+"As shown in Table 1, the data reveals significant trends."
+
+The test expects:
+
+is_common_academic_phrase(cleaned) is True
+
+for all three.
+
+Current result:
+
+False
+
+for the first phrase.
+
+Therefore the common academic phrase detector is too restrictive.
+
+---
+
+# FIX COMMON ACADEMIC LANGUAGE DETECTION
+
+Inspect the existing:
+
+is_common_academic_phrase()
+
+implementation.
+
+Do not simply return True for every sentence.
+
+We need a robust rule-based/common-phrase detector.
+
+The purpose is to prevent generic academic language from producing false plagiarism alerts.
+
+Recognize common academic constructions such as:
+
+"In this study..."
+"The results indicate that..."
+"The purpose of this research is..."
+"This research aims to..."
+"This study investigates..."
+"As shown in Table 1..."
+"As shown in Figure 1..."
+"The data reveals..."
+"The findings indicate..."
+"The results demonstrate..."
+"The experimental results show..."
+"This paper presents..."
+"This paper investigates..."
+"The objective of this study..."
+"The aim of this research..."
+"In conclusion..."
+"According to the results..."
+"The proposed method..."
+"The experimental results..."
+"Statistically significant..."
+"Results indicate that..."
+"The findings suggest that..."
+
+The implementation should be general enough to recognize variations.
+
+For example:
+
+"In this study, the results indicate that the experimental hypothesis is validated."
+
+should match because it contains common academic constructions:
+
+"in this study"
+
+and
+
+"the results indicate that"
+
+Likewise:
+
+"The purpose of this research is to investigate the parameters."
+
+contains:
+
+"the purpose of this research is"
+
+"As shown in Table 1, the data reveals significant trends."
+
+contains:
+
+"as shown in table"
+
+and common results language.
+
+---
+
+# IMPORTANT: COMMON PHRASE ≠ ENTIRE SENTENCE IS PLAGIARIZED
+
+The common academic detector should be used to reduce false positives.
+
+It must NOT prevent the plagiarism engine from finding genuinely distinctive copied text.
+
+Example:
+
+"In this study, we introduce our proprietary algorithm called RadNet-X900, which achieves 97.3% accuracy on the XYZ dataset."
+
+This should NOT automatically be treated as completely harmless just because it starts with:
+
+"In this study"
+
+The system should distinguish:
+
+COMMON ACADEMIC PORTION
+
+from
+
+DISTINCTIVE CONTENT
+
+Prefer detecting common phrase patterns and/or calculating the proportion of generic language.
+
+Do not blindly classify the entire sentence as common if it contains substantial unique material.
+
+---
+
+# RECOMMENDED IMPLEMENTATION
+
+Inspect the current implementation first.
+
+If the project already has:
+
+* COMMON_ACADEMIC_PHRASES
+* regex patterns
+* stopword logic
+* phrase dictionaries
+* token scoring
+
+extend those structures instead of creating an unrelated detector.
+
+Use normalized lowercase text.
+
+Handle punctuation differences.
+
+Examples:
+
+"In this study, ..."
+"in this study ..."
+"IN THIS STUDY"
+
+should behave consistently.
+
+Also handle:
+
+"Table 1"
+"Table 2"
+"Table 10"
+
+without hardcoding only Table 1.
+
+Likewise:
+
+"Figure 1"
+"Figure 2"
+
+---
+
+# DO NOT MODIFY THE TEST FILE
+
+The file:
+
+tests/test_verification_scenarios.py
+
+must NOT be modified.
+
+The goal is to make the implementation satisfy the existing expected behavior.
+
+---
+
+# REGRESSION SAFETY
+
+After implementing the fixes, run:
+
+python -m pytest tests/test_verification_scenarios.py -v
+
+Expected:
+
+12 passed
+
+Then run the entire project test suite:
+
+python -m pytest -v
+
+Do not stop after the targeted test passes.
+
+If additional tests fail because of the changes, fix the implementation without weakening existing functionality.
+
+---
+
+# INVESTIGATE BEFORE EDITING
+
+Before making changes, inspect:
+
+1. Project structure.
+2. Engine implementation.
+3. Match model/dataclass.
+4. SentenceUnit model.
+5. Preprocessing pipeline.
+6. Citation detector.
+7. Common academic phrase detector.
+8. Exact similarity algorithm.
+9. Fuzzy similarity algorithm.
+10. Semantic similarity algorithm.
+11. Match filtering.
+12. Score calculation.
+13. Existing tests.
+
+Do not guess the architecture.
+
+---
+
+# DEBUGGING REQUIREMENT
+
+Temporarily add useful debug logging if necessary.
+
+For the failing citation test, trace:
+
+DOCUMENT SENTENCE
+↓
+NORMALIZED SENTENCE
+↓
+CITATION DETECTION
+↓
+SOURCE SENTENCE
+↓
+NORMALIZED SOURCE
+↓
+EXACT SIMILARITY
+↓
+MATCH CREATION
+↓
+MATCH FILTERING
+↓
+RISK CLASSIFICATION
+↓
+RESULT.MATCHES
+
+Identify exactly where the match disappears.
+
+After debugging, keep only useful production logging and remove noisy debug output.
+
+---
+
+# EXACT MATCH REQUIREMENT
+
+For the test sentence:
+
+User:
+
+"Convolutional neural networks achieve state-of-the-art performance in complex radiological pattern identification."
+
+Source:
+
+"Convolutional neural networks achieve state-of-the-art performance in complex radiological pattern identification."
+
+The normalized versions should compare as identical.
+
+Therefore the engine should generate an exact match.
+
+The trailing citation:
+
+[1]
+
+must not change the textual similarity result.
+
+Conceptually:
+
+# normalize(paper_sentence)
+
+normalize(source_sentence)
+
+→ EXACT MATCH
+
+Citation is metadata/context, not a reason to suppress similarity.
+
+---
+
+# MATCH DATA
+
+Use the project's existing Match/MatchResult data model.
+
+Populate as many relevant fields as the current model supports:
+
+* source_id
+* source_name
+* original_text
+* matched_text
+* similarity
+* match_type
+* confidence
+* citation_status
+* quotation_status
+* risk_level
+* page_number
+* sentence_index
+
+Do not break backwards compatibility.
+
+---
+
+# SCORE REQUIREMENT
+
+After fixing test 3, do not artificially inflate the overall plagiarism score.
+
+A cited exact match can legitimately contribute to:
+
+* total similarity
+* exact similarity
+* matched words
+
+while simultaneously receiving a lower plagiarism-risk classification because it is cited.
+
+This distinction is essential.
+
+Example:
+
+Overall similarity:
+100%
+
+High-risk unattributed similarity:
+0%
+
+Cited similarity:
+100%
+
+That may be appropriate for a paper consisting entirely of a properly cited quotation, depending on quotation/reference context.
+
+The system must distinguish similarity from plagiarism risk.
+
+---
+
+# COMMON PHRASE SCORING
+
+Do not simply remove common academic sentences from all analysis.
+
+Prefer:
+
+1. Detect common phrase.
+2. Mark it as common/low-risk.
+3. Reduce its contribution to plagiarism-risk scoring.
+4. Preserve it in analysis where useful.
+
+If the existing architecture already has:
+
+ignored_count
+common_matches_percentage
+common_matches
+
+use those mechanisms.
+
+Do not introduce a second conflicting scoring system.
+
+---
+
+# NO TEST HARDCODING
+
+DO NOT add code such as:
+
+if "Convolutional neural networks achieve" in text:
+...
+
+DO NOT add:
+
+if source_id == 3:
+...
+
+DO NOT add:
+
+if test_3:
+...
+
+DO NOT add:
+
+if "In this study" exactly:
+return True
+
+Implement general-purpose logic.
+
+---
+
+# EXPECTED BEHAVIOR AFTER FIX
+
+Run:
+
+python -m pytest tests/test_verification_scenarios.py -v
+
+Expected:
+
+test_1_completely_original_paper PASSED
+test_2_exact_copied_paragraph PASSED
+test_3_copied_paragraph_with_citation PASSED
+test_4_proper_quotation PASSED
+test_5_paraphrased_paragraph PASSED
+test_6_common_academic_language PASSED
+test_7_fake_unverifiable_reference PASSED
+test_8_correct_doi_verification PASSED
+test_9_metadata_mismatch PASSED
+test_10_unused_reference_detection PASSED
+test_11_missing_citation_detection PASSED
+test_12_offline_mode_execution PASSED
+
+Final:
+
+12 passed
+
+---
+
+# ADDITIONAL REGRESSION TESTS
+
+After fixing the existing tests, add NEW implementation tests if the project's testing architecture supports it.
+
+Do not modify the existing tests.
+
+Add tests for:
+
+1. Exact copied text without citation.
+   Expected:
+   Match exists + high risk.
+
+2. Exact copied text with citation.
+   Expected:
+   Match exists + cited status.
+
+3. Exact copied text with quotation + citation.
+   Expected:
+   Match exists + quotation/citation recognized.
+
+4. Paraphrased text with citation.
+   Expected:
+   Semantic match exists + cited status.
+
+5. Common phrase with unique technical content.
+   Expected:
+   Not completely ignored.
+
+6. Citation after sentence.
+   Expected:
+   Citation associated with preceding sentence.
+
+7. Multiple citations.
+   Expected:
+   Correct citation extraction.
+
+8. Citation range.
+   Example:
+   [1–4]
+
+9. Author-year citation.
+   Example:
+   (Smith et al., 2024)
+
+10. No citation.
+    Expected:
+    No false citation detection.
+
+---
+
+# FINAL REPORT
+
+After making the changes, provide:
+
+## FIXES IMPLEMENTED
+
+List the exact files modified.
+
+For each file explain:
+
+* What was wrong.
+* What was changed.
+* Why the change fixes the underlying issue.
+
+## TEST RESULTS
+
+Show:
+
+python -m pytest tests/test_verification_scenarios.py -v
+
+and the final result.
+
+Then show:
+
+python -m pytest -v
+
+and the complete result.
+
+## IMPORTANT
+
+If any tests still fail:
+
+DO NOT claim success.
+
+Report:
+
+* failing test
+* error
+* likely cause
+* what remains to be fixed
+
+The final objective is:
+
+**Fix the underlying plagiarism-detection and citation-classification logic while preserving all existing functionality.**

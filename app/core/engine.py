@@ -117,6 +117,25 @@ class PlagiarismDetectionEngine:
         citations.unused_references_count = unused_cnt
         citations.mismatched_citations_count = mismatch_cnt
 
+        # Link in-text citations and quotations to SentenceUnits
+        total_sents = len(preprocessed.sentences)
+        for s_i, sent in enumerate(preprocessed.sentences):
+            is_q, q_has_c = self.citation_analyzer.is_offset_in_quote(
+                sent.start_char, sent.end_char, citations.quotes
+            )
+            sent.is_quoted = is_q
+            next_sent_start = preprocessed.sentences[s_i + 1].start_char if s_i + 1 < total_sents else len(extracted.full_text)
+            
+            # Check for in-sentence or trailing citations (e.g. "...identification. [1]")
+            has_c = q_has_c or any(
+                (sent.start_char <= c.start_char <= sent.end_char) or
+                (sent.start_char <= c.end_char <= sent.end_char) or
+                (sent.end_char <= c.start_char <= next_sent_start and (c.start_char - sent.end_char) <= 50) or
+                abs(c.start_char - sent.end_char) <= 40
+                for c in citations.citations
+            )
+            sent.is_cited = has_c
+
         update_progress(45, "Verifying references over academic registries (Crossref/OpenAlex)...")
         enable_web = self.settings.get("enable_web_search", True)
         if enable_web and parsed_refs:
@@ -198,14 +217,11 @@ class PlagiarismDetectionEngine:
                 continue
 
             # 2. Check if quoted & cited
-            is_quoted, has_cit = self.citation_analyzer.is_offset_in_quote(
-                sentence.start_char, sentence.end_char, citations.quotes
-            )
+            is_quoted = sentence.is_quoted
+            has_cit = sentence.is_cited
 
             # 3. Check for common academic phrase
             is_common = is_common_academic_phrase(sentence.normalized_text)
-            if filter_common and is_common:
-                continue
 
             if len(sentence.tokens) < min_words:
                 continue
@@ -262,6 +278,8 @@ class PlagiarismDetectionEngine:
                     best_match["match_category"] = "Copied + Cited Without Quotation"
                 elif is_common:
                     best_match["match_category"] = "Common Knowledge"
+                    if filter_common:
+                        best_match["is_ignored"] = True
                 else:
                     best_match["match_category"] = "Copied + No Citation"
                 matches.append(best_match)
@@ -270,6 +288,7 @@ class PlagiarismDetectionEngine:
                 # Categorize fuzzy match
                 category = "Paraphrased + Cited" if has_cit else ("Common Knowledge" if is_common else "Copied + No Citation")
                 confidence = "High" if best_score >= 90 else "Medium"
+                is_ign = bool(filter_common and is_common and not has_cit and not is_quoted)
                 matches.append({
                     "sentence": sentence.original_text,
                     "matched_text": best_source_text,
@@ -280,7 +299,7 @@ class PlagiarismDetectionEngine:
                     "end_char": sentence.end_char,
                     "is_quoted": is_quoted,
                     "is_cited": has_cit,
-                    "is_ignored": False,
+                    "is_ignored": is_ign,
                     "source_name": best_source.name,
                     "source_id": best_source.source_id,
                     "source_url": best_source.url,
@@ -304,7 +323,8 @@ class PlagiarismDetectionEngine:
                     for orig_src, clean_src, src_obj in candidates:
                         sem_score = self.semantic_engine.compute_similarity(sentence.original_text, orig_src)
                         if sem_score >= semantic_threshold and sem_score > best_score:
-                            category = "Paraphrased + Cited" if has_cit else "Paraphrased (Uncited)"
+                            category = "Paraphrased + Cited" if has_cit else ("Common Knowledge" if is_common else "Paraphrased (Uncited)")
+                            is_ign = bool(filter_common and is_common and not has_cit and not is_quoted)
                             matches.append({
                                 "sentence": sentence.original_text,
                                 "matched_text": orig_src,
@@ -315,7 +335,7 @@ class PlagiarismDetectionEngine:
                                 "end_char": sentence.end_char,
                                 "is_quoted": is_quoted,
                                 "is_cited": has_cit,
-                                "is_ignored": False,
+                                "is_ignored": is_ign,
                                 "source_name": src_obj.name,
                                 "source_id": src_obj.source_id,
                                 "source_url": src_obj.url,
