@@ -169,7 +169,7 @@ class DashboardView(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(5, QHeaderView.Fixed)
-        self.table.setColumnWidth(5, 160)
+        self.table.setColumnWidth(5, 165)
         self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Fixed)
         self.table.setColumnWidth(6, 110)
         self.table.horizontalHeader().setMinimumSectionSize(75)
@@ -304,14 +304,13 @@ class DashboardView(QWidget):
                         border-radius: 4px;
                         font-size: 11px;
                         font-weight: 700;
-                        padding: 3px 10px;
-                        min-height: 20px;
-                        max-height: 24px;
+                        padding: 3px 8px;
+                        min-height: 22px;
                     """)
                     badge_box = QWidget()
                     badge_box.setStyleSheet("background: transparent;")
                     badge_layout = QHBoxLayout(badge_box)
-                    badge_layout.setContentsMargins(6, 2, 6, 2)
+                    badge_layout.setContentsMargins(4, 2, 4, 2)
                     badge_layout.setAlignment(Qt.AlignCenter)
                     badge_layout.addWidget(badge)
                     self.table.setCellWidget(row_idx, 5, badge_box)
