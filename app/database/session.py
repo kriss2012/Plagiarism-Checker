@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from app.config import DATABASE_URL, DEFAULT_SETTINGS
-from app.database.models import Base, Document, Match, Report, Setting, Source
+from app.database.models import Base, CitationIssue, Document, Match, Reference, Report, Setting, Source
 from app.utils.logger import logger
 
 # Create SQLAlchemy engine for SQLite with multi-thread support
@@ -24,13 +24,14 @@ Session = scoped_session(SessionFactory)
 
 
 def _migrate_columns():
-    """Ensures existing SQLite documents table has all newly added student columns."""
+    """Ensures existing SQLite tables have all newly added research verification columns."""
     with engine.connect() as conn:
         try:
+            # 1. Migrate documents table
             result = conn.execute(text("PRAGMA table_info(documents);")).fetchall()
-            existing_cols = {row[1] for row in result}
+            existing_doc_cols = {row[1] for row in result}
             
-            new_columns = [
+            new_doc_columns = [
                 ("student_name", "VARCHAR(255) DEFAULT 'Student'"),
                 ("prn_number", "VARCHAR(64) DEFAULT ''"),
                 ("course_name", "VARCHAR(64) DEFAULT 'MCA'"),
@@ -40,12 +41,42 @@ def _migrate_columns():
                 ("paper_title", "VARCHAR(512) DEFAULT ''"),
                 ("clearance_status", "VARCHAR(64) DEFAULT 'Approved (Level 0)'"),
                 ("certificate_no", "VARCHAR(64) DEFAULT ''"),
+                ("direct_match_score", "FLOAT DEFAULT 0.0"),
+                ("semantic_similarity_score", "FLOAT DEFAULT 0.0"),
+                ("citation_coverage_score", "FLOAT DEFAULT 100.0"),
+                ("reference_verification_score", "FLOAT DEFAULT 100.0"),
+                ("high_risk_similarity", "FLOAT DEFAULT 0.0"),
+                ("academic_verdict", "VARCHAR(64) DEFAULT 'LOW CONCERN'"),
+                ("references_count", "INTEGER DEFAULT 0"),
+                ("verified_references_count", "INTEGER DEFAULT 0"),
+                ("citation_issues_count", "INTEGER DEFAULT 0"),
             ]
             
-            for col_name, col_def in new_columns:
-                if col_name not in existing_cols:
+            for col_name, col_def in new_doc_columns:
+                if col_name not in existing_doc_cols:
                     logger.info(f"Migrating database: Adding column {col_name} to documents table")
                     conn.execute(text(f"ALTER TABLE documents ADD COLUMN {col_name} {col_def};"))
+
+            # 2. Migrate matches table
+            m_result = conn.execute(text("PRAGMA table_info(matches);")).fetchall()
+            existing_match_cols = {row[1] for row in m_result}
+
+            new_match_columns = [
+                ("confidence", "VARCHAR(32) DEFAULT 'High'"),
+                ("match_category", "VARCHAR(64) DEFAULT 'Copied + No Citation'"),
+                ("source_url", "VARCHAR(1024)"),
+                ("source_domain", "VARCHAR(255)"),
+                ("source_type", "VARCHAR(64) DEFAULT 'Journal'"),
+                ("source_reliability", "VARCHAR(32) DEFAULT 'High'"),
+                ("review_decision", "VARCHAR(64) DEFAULT 'Pending Review'"),
+                ("review_notes", "TEXT"),
+            ]
+
+            for col_name, col_def in new_match_columns:
+                if col_name not in existing_match_cols:
+                    logger.info(f"Migrating database: Adding column {col_name} to matches table")
+                    conn.execute(text(f"ALTER TABLE matches ADD COLUMN {col_name} {col_def};"))
+
             conn.commit()
         except Exception as e:
             logger.warning(f"Database column migration note: {e}")
