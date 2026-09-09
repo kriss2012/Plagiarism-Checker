@@ -210,3 +210,21 @@ AttributeError: 'SettingsView' object has no attribute 'theme_changed'
 2026-09-09 11:32:59 [INFO] (ResearchGuard) Ensuring database indices exist...
 2026-09-09 11:32:59 [INFO] (ResearchGuard) Database initialized successfully.
 2026-09-09 11:32:59 [INFO] (ResearchGuard) Database initialised successfully.
+2026-09-09 12:35:52 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-09 12:35:52 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-09 12:35:52 [INFO] (ResearchGuard) Starting plagiarism analysis for: suspicious_paper.txt
+2026-09-09 12:35:52 [INFO] (ResearchGuard) Comparing 21 document sentences against 16 source sentences.
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Starting plagiarism analysis for: sample_source.txt
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Comparing 22 document sentences against 16 source sentences.
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Extracting content from: test_sample.pdf (.pdf)
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Extracting content from: test_sample.docx (.docx)
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-09 12:35:55 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-09 12:35:56 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_pdf_report_generation0\test_report.pdf
+2026-09-09 12:35:57 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_pdf_report_generation0\test_report.pdf
+2026-09-09 12:35:57 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-09 12:35:57 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
