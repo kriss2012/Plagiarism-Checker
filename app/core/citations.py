@@ -26,11 +26,24 @@ class QuoteMatch:
 
 
 @dataclass
+class CitationIssue:
+    issue_type: str  # "Missing Reference", "Unused Reference", "Citation Mismatch", "Citation Numbering Error", "Duplicate Citation", "Broken Citation"
+    citation_text: str
+    page_number: int = 1
+    details: str = ""
+    ref_number: Optional[int] = None
+
+
+@dataclass
 class CitationAnalysisResult:
     citation_count: int
     reference_count: int
     citations: List[CitationMatch] = field(default_factory=list)
     quotes: List[QuoteMatch] = field(default_factory=list)
+    citation_issues: List[CitationIssue] = field(default_factory=list)
+    missing_citations_count: int = 0
+    unused_references_count: int = 0
+    mismatched_citations_count: int = 0
     uncited_claims: int = 0
     warnings: List[str] = field(default_factory=list)
 
