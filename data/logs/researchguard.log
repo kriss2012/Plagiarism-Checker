@@ -228,3 +228,41 @@ AttributeError: 'SettingsView' object has no attribute 'theme_changed'
 2026-09-09 12:35:57 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_pdf_report_generation0\test_report.pdf
 2026-09-09 12:35:57 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
 2026-09-09 12:35:57 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-0\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column direct_match_score to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column semantic_similarity_score to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column citation_coverage_score to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column reference_verification_score to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column high_risk_similarity to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column academic_verdict to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column references_count to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column verified_references_count to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column citation_issues_count to documents table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column confidence to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column match_category to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column source_url to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column source_domain to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column source_type to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column source_reliability to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column review_decision to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Migrating database: Adding column review_notes to matches table
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-09 12:41:58 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-09 12:42:06 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-09 12:42:06 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-09 12:42:06 [INFO] (ResearchGuard) Starting research paper verification for: suspicious_paper.txt
+2026-09-09 12:42:06 [INFO] (ResearchGuard) Comparing 21 sentences against 16 source sentences.
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Starting research paper verification for: sample_source.txt
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Comparing 22 sentences against 16 source sentences.
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Extracting content from: test_sample.pdf (.pdf)
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Extracting content from: test_sample.docx (.docx)
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-09 12:42:07 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-09 12:42:08 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_pdf_report_generation0\test_report.pdf
+2026-09-09 12:42:08 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_pdf_report_generation0\test_report.pdf
+2026-09-09 12:42:08 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-09 12:42:09 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-1\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
