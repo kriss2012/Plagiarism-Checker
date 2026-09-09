@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QCheckBox,
     QComboBox,
     QFileDialog,
@@ -66,8 +67,8 @@ class NewCheckView(QWidget):
 
         container = QWidget()
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(20, 18, 20, 20)
-        layout.setSpacing(14)
+        layout.setContentsMargins(18, 14, 18, 14)
+        layout.setSpacing(10)
 
         # 1. Header Banner
         header_box = QVBoxLayout()
@@ -187,13 +188,13 @@ class NewCheckView(QWidget):
         for c in range(1, 5):
             self.queue_table.horizontalHeader().setSectionResizeMode(c, QHeaderView.ResizeToContents)
         self.queue_table.horizontalHeader().setSectionResizeMode(5, QHeaderView.Fixed)
-        self.queue_table.setColumnWidth(5, 105)
+        self.queue_table.setColumnWidth(5, 115)
         self.queue_table.verticalHeader().setVisible(False)
         self.queue_table.verticalHeader().setDefaultSectionSize(40)
         self.queue_table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.queue_table.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.queue_table.setMinimumHeight(100)
-        self.queue_table.setMaximumHeight(180)
+        self.queue_table.setMinimumHeight(85)
+        self.queue_table.setMaximumHeight(160)
         f_layout.addWidget(self.queue_table)
 
         layout.addWidget(file_card)
@@ -351,13 +352,15 @@ class NewCheckView(QWidget):
 
             rm_btn = QPushButton("Remove")
             rm_btn.setObjectName("dangerBtn")
+            rm_btn.setMinimumWidth(76)
+            rm_btn.setFixedHeight(26)
             rm_btn.setCursor(Qt.PointingHandCursor)
             rm_btn.clicked.connect(lambda chk=False, row=idx: self._remove_from_queue(row))
 
             btn_box = QWidget()
             btn_box.setStyleSheet("background: transparent;")
             btn_layout = QHBoxLayout(btn_box)
-            btn_layout.setContentsMargins(6, 2, 6, 2)
+            btn_layout.setContentsMargins(4, 2, 4, 2)
             btn_layout.setAlignment(Qt.AlignCenter)
             btn_layout.addWidget(rm_btn)
             self.queue_table.setCellWidget(idx, 5, btn_box)
