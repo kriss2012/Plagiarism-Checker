@@ -113,18 +113,44 @@ class MatchViewerView(QWidget):
         ins_hdr.addWidget(self.ins_sim_lbl)
         ins_layout.addLayout(ins_hdr)
 
-        self.ins_algo_lbl = QLabel("Algorithm: -")
+        # Category, Confidence, and Source Quality Row
+        meta_row = QHBoxLayout()
+        meta_row.setSpacing(6)
+        self.ins_category_badge = QLabel("COPIED + NO CITATION")
+        self.ins_category_badge.setStyleSheet("""
+            background-color: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5;
+            border-radius: 4px; font-weight: 700; font-size: 11px; padding: 3px 8px;
+        """)
+        meta_row.addWidget(self.ins_category_badge)
+
+        self.ins_confidence_badge = QLabel("HIGH CONFIDENCE")
+        self.ins_confidence_badge.setStyleSheet("""
+            background-color: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;
+            border-radius: 4px; font-weight: 700; font-size: 11px; padding: 3px 8px;
+        """)
+        meta_row.addWidget(self.ins_confidence_badge)
+
+        self.ins_reliability_badge = QLabel("SOURCE: HIGH")
+        self.ins_reliability_badge.setStyleSheet("""
+            background-color: #ECFDF5; color: #047857; border: 1px solid #6EE7B7;
+            border-radius: 4px; font-weight: 700; font-size: 11px; padding: 3px 8px;
+        """)
+        meta_row.addWidget(self.ins_reliability_badge)
+        meta_row.addStretch()
+        ins_layout.addLayout(meta_row)
+
+        self.ins_algo_lbl = QLabel("Detection Method: -")
         self.ins_algo_lbl.setStyleSheet("color: #475569; font-size: 12px;")
         ins_layout.addWidget(self.ins_algo_lbl)
 
-        self.ins_page_lbl = QLabel("Page: -")
+        self.ins_page_lbl = QLabel("Page Number: -")
         self.ins_page_lbl.setStyleSheet("color: #475569; font-size: 12px;")
         ins_layout.addWidget(self.ins_page_lbl)
 
         # Source Title / Origin
         ins_layout.addWidget(QLabel("Matched Source:"))
         self.ins_source_title = QLabel("Source Name")
-        self.ins_source_title.setStyleSheet("color: #002461; font-weight: 700; font-size: 14px;")
+        self.ins_source_title.setStyleSheet("color: #002461; font-weight: 700; font-size: 13.5px;")
         self.ins_source_title.setWordWrap(True)
         ins_layout.addWidget(self.ins_source_title)
 
@@ -133,19 +159,79 @@ class MatchViewerView(QWidget):
         self.ins_source_text = QTextEdit()
         self.ins_source_text.setReadOnly(True)
         self.ins_source_text.setObjectName("matchSourceText")
-        self.ins_source_text.setMaximumHeight(150)
+        self.ins_source_text.setMaximumHeight(140)
         ins_layout.addWidget(self.ins_source_text)
 
-        # Action Buttons
+        # Human Review Decision Display
+        review_hdr = QHBoxLayout()
+        review_hdr.addWidget(QLabel("Researcher Review Decision:"))
+        self.ins_decision_lbl = QLabel("Pending Review")
+        self.ins_decision_lbl.setStyleSheet("font-weight: 800; color: #4338CA;")
+        review_hdr.addWidget(self.ins_decision_lbl)
+        review_hdr.addStretch()
+        ins_layout.addLayout(review_hdr)
+
+        self.ins_notes_lbl = QLabel("")
+        self.ins_notes_lbl.setStyleSheet("font-size: 11px; color: #64748B; font-style: italic;")
+        self.ins_notes_lbl.setWordWrap(True)
+        ins_layout.addWidget(self.ins_notes_lbl)
+
+        # Human Review Buttons (Grid)
+        rev_box = QVBoxLayout()
+        rev_box.setSpacing(6)
+        
+        row1 = QHBoxLayout()
+        self.btn_confirm = QPushButton("✓ Confirm Match")
+        self.btn_confirm.setFixedHeight(30)
+        self.btn_confirm.setCursor(Qt.PointingHandCursor)
+        self.btn_confirm.clicked.connect(lambda: self._set_decision("Confirmed Match"))
+        row1.addWidget(self.btn_confirm)
+
+        self.btn_not_plag = QPushButton("Not Plagiarism")
+        self.btn_not_plag.setFixedHeight(30)
+        self.btn_not_plag.setCursor(Qt.PointingHandCursor)
+        self.btn_not_plag.clicked.connect(lambda: self._set_decision("Not Plagiarism"))
+        row1.addWidget(self.btn_not_plag)
+
+        self.btn_common = QPushButton("Common Knowledge")
+        self.btn_common.setFixedHeight(30)
+        self.btn_common.setCursor(Qt.PointingHandCursor)
+        self.btn_common.clicked.connect(lambda: self._set_decision("Common Knowledge"))
+        row1.addWidget(self.btn_common)
+        rev_box.addLayout(row1)
+
+        row2 = QHBoxLayout()
+        self.btn_cited = QPushButton("Properly Cited")
+        self.btn_cited.setFixedHeight(30)
+        self.btn_cited.setCursor(Qt.PointingHandCursor)
+        self.btn_cited.clicked.connect(lambda: self._set_decision("Properly Cited"))
+        row2.addWidget(self.btn_cited)
+
+        self.btn_fp = QPushButton("False Positive")
+        self.btn_fp.setFixedHeight(30)
+        self.btn_fp.setCursor(Qt.PointingHandCursor)
+        self.btn_fp.clicked.connect(lambda: self._set_decision("False Positive"))
+        row2.addWidget(self.btn_fp)
+
+        self.btn_note = QPushButton("✎ Add Note")
+        self.btn_note.setFixedHeight(30)
+        self.btn_note.setCursor(Qt.PointingHandCursor)
+        self.btn_note.clicked.connect(self._add_review_note)
+        row2.addWidget(self.btn_note)
+        rev_box.addLayout(row2)
+
+        ins_layout.addLayout(rev_box)
+
+        # Standard Action Buttons
         ins_btn_row = QHBoxLayout()
         self.ignore_btn = QPushButton("Ignore Match")
-        self.ignore_btn.setFixedHeight(34)
+        self.ignore_btn.setFixedHeight(32)
         self.ignore_btn.setCursor(Qt.PointingHandCursor)
         self.ignore_btn.clicked.connect(self._toggle_ignore_match)
         ins_btn_row.addWidget(self.ignore_btn)
 
         self.copy_btn = QPushButton("Copy Excerpt")
-        self.copy_btn.setFixedHeight(34)
+        self.copy_btn.setFixedHeight(32)
         self.copy_btn.setCursor(Qt.PointingHandCursor)
         self.copy_btn.clicked.connect(self._copy_excerpt)
         ins_btn_row.addWidget(self.copy_btn)
@@ -156,7 +242,7 @@ class MatchViewerView(QWidget):
         r_box.addWidget(self.inspector_card)
         splitter.addWidget(right_container)
 
-        # Initial ratio: 60% left, 40% right
+        # Initial ratio: 58% left, 42% right
         splitter.setStretchFactor(0, 3)
         splitter.setStretchFactor(1, 2)
 
@@ -182,6 +268,9 @@ class MatchViewerView(QWidget):
             self.ins_source_title.setText("No matches detected in document.")
             self.ins_source_text.clear()
             self.match_counter_lbl.setText("0 of 0")
+            self.ins_category_badge.setText("CLEARED")
+            self.ins_decision_lbl.setText("No Action Needed")
+            self.ins_notes_lbl.setText("")
             return
 
         idx = self._current_index
@@ -192,17 +281,64 @@ class MatchViewerView(QWidget):
         sim_val = m.get("similarity_score", 0.0)
         self.ins_sim_lbl.setText(f"{sim_val:.0f}% Similarity")
 
+        # Category and badges
+        cat = m.get("match_category", "Copied + No Citation").upper()
+        self.ins_category_badge.setText(cat)
+        if "NO CITATION" in cat or "EXACT" in cat:
+            self.ins_category_badge.setStyleSheet("background-color: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; border-radius: 4px; font-weight: 700; font-size: 10px; padding: 3px 6px;")
+        elif "QUOTED" in cat or "CITED" in cat:
+            self.ins_category_badge.setStyleSheet("background-color: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; border-radius: 4px; font-weight: 700; font-size: 10px; padding: 3px 6px;")
+        else:
+            self.ins_category_badge.setStyleSheet("background-color: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; border-radius: 4px; font-weight: 700; font-size: 10px; padding: 3px 6px;")
+
+        conf = m.get("confidence", "High").upper()
+        self.ins_confidence_badge.setText(f"{conf} CONFIDENCE")
+
+        rel = m.get("source_reliability", "High").upper()
+        self.ins_reliability_badge.setText(f"RELIABILITY: {rel}")
+
         algo = m.get("algorithm", "Fuzzy Match")
         self.ins_algo_lbl.setText(f"Detection Method: {algo}")
         self.ins_page_lbl.setText(f"Page Number: {m.get('page_number', 1)}")
         self.ins_source_title.setText(m.get("source_name", "Comparison Source"))
         self.ins_source_text.setPlainText(m.get("matched_text", ""))
 
+        # Human Review status
+        decision = m.get("review_decision", "Pending Review")
+        self.ins_decision_lbl.setText(decision)
+        notes = m.get("review_notes", "")
+        self.ins_notes_lbl.setText(f"Notes: {notes}" if notes else "No reviewer notes added yet.")
+
         is_ignored = m.get("is_ignored", False)
         self.ignore_btn.setText("Restore Match" if is_ignored else "Ignore Match")
 
         # Focus in highlight editor
         self.highlight_editor.highlight_specific_match(m)
+
+    def _set_decision(self, decision_text: str):
+        if self._matches:
+            cur = self._matches[self._current_index]
+            cur["review_decision"] = decision_text
+            if decision_text in ["Not Plagiarism", "Common Knowledge", "Properly Cited", "False Positive"]:
+                cur["is_ignored"] = True
+            elif decision_text == "Confirmed Match":
+                cur["is_ignored"] = False
+            self._update_inspector()
+            self.highlight_editor.load_document(self._data.get("extracted_text", ""), self._matches)
+
+    def _add_review_note(self):
+        from PySide6.QtWidgets import QInputDialog
+        if self._matches:
+            cur = self._matches[self._current_index]
+            existing_note = cur.get("review_notes", "")
+            text, ok = QInputDialog.getText(
+                self, "Researcher Review Note",
+                f"Add verification / guidance note for Match #{self._current_index + 1}:",
+                text=existing_note
+            )
+            if ok:
+                cur["review_notes"] = text.strip()
+                self._update_inspector()
 
     def _prev_match(self):
         if self._matches and self._current_index > 0:
@@ -226,6 +362,10 @@ class MatchViewerView(QWidget):
         if self._matches:
             cur = self._matches[self._current_index]
             cur["is_ignored"] = not cur.get("is_ignored", False)
+            if cur["is_ignored"]:
+                cur["review_decision"] = "Ignored"
+            else:
+                cur["review_decision"] = "Pending Review"
             self._update_inspector()
             self.highlight_editor.load_document(self._data.get("extracted_text", ""), self._matches)
 
