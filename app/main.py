@@ -77,6 +77,11 @@ def main():
 
     def _launch_main():
         """Called when the splash animation finishes."""
+        try:
+            splash.close()
+        except Exception:
+            pass
+
         if db_error:
             QMessageBox.critical(
                 None, "Database Error",
@@ -89,6 +94,8 @@ def main():
             window = MainWindow()
             window_holder["w"] = window   # keep reference alive
             window.show()
+            window.raise_()
+            window.activateWindow()
         except Exception as e:
             logger.error(f"Failed to show main window: {e}", exc_info=True)
             QMessageBox.critical(None, "Startup Error", f"Could not launch application window:\n{e}")
