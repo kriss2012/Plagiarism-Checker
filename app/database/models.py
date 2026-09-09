@@ -1,8 +1,10 @@
 """SQLAlchemy ORM models for IMRD ResearchGuard.
-Stores student academic particulars, paper metrics, similarity matches, and official clearance records.
+Stores student academic particulars, paper metrics, similarity matches, structured references,
+citation audits, human review decisions, and official clearance records.
 """
 
 from datetime import datetime
+import json
 from sqlalchemy import (
     Boolean,
     Column,
@@ -45,7 +47,7 @@ class Document(Base):
     clearance_status = Column(String(64), default="Approved (Level 0)")  # Approved (Level 0), Revisions Required (Level 1), Major Revisions (Level 2), Rejected (Level 3)
     certificate_no = Column(String(64), default="")
 
-    # Overall similarity metrics
+    # Overall similarity & multidimensional verification scores
     overall_similarity = Column(Float, default=0.0)
     risk_level = Column(String(32), default="Very Low")  # Very Low, Low, Moderate, High, Very High
     exact_matches_count = Column(Integer, default=0)
@@ -54,12 +56,27 @@ class Document(Base):
     quoted_matches_count = Column(Integer, default=0)
     ai_likelihood = Column(String(32), default="Low")
 
+    # Advanced verification scores
+    direct_match_score = Column(Float, default=0.0)
+    semantic_similarity_score = Column(Float, default=0.0)
+    citation_coverage_score = Column(Float, default=100.0)
+    reference_verification_score = Column(Float, default=100.0)
+    high_risk_similarity = Column(Float, default=0.0)
+    academic_verdict = Column(String(64), default="LOW CONCERN")  # LOW CONCERN, MODERATE CONCERN, HIGH CONCERN, INCONCLUSIVE
+
+    # Reference & Citation tallies
+    references_count = Column(Integer, default=0)
+    verified_references_count = Column(Integer, default=0)
+    citation_issues_count = Column(Integer, default=0)
+
     # Document contents and academic structure
     extracted_text = Column(Text, nullable=True)
     structure_json = Column(Text, nullable=True)
 
     # Relationships
     matches = relationship("Match", back_populates="document", cascade="all, delete-orphan")
+    references = relationship("Reference", back_populates="document", cascade="all, delete-orphan")
+    citation_issues = relationship("CitationIssue", back_populates="document", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="document", cascade="all, delete-orphan")
 
     def to_dict(self):
@@ -89,6 +106,15 @@ class Document(Base):
             "semantic_matches_count": self.semantic_matches_count,
             "quoted_matches_count": self.quoted_matches_count,
             "ai_likelihood": self.ai_likelihood,
+            "direct_match_score": round(self.direct_match_score or 0.0, 1),
+            "semantic_similarity_score": round(self.semantic_similarity_score or 0.0, 1),
+            "citation_coverage_score": round(self.citation_coverage_score or 100.0, 1),
+            "reference_verification_score": round(self.reference_verification_score or 100.0, 1),
+            "high_risk_similarity": round(self.high_risk_similarity or 0.0, 1),
+            "academic_verdict": self.academic_verdict or "LOW CONCERN",
+            "references_count": self.references_count or 0,
+            "verified_references_count": self.verified_references_count or 0,
+            "citation_issues_count": self.citation_issues_count or 0,
         }
 
 
@@ -149,6 +175,18 @@ class Match(Base):
     is_ignored = Column(Boolean, default=False)
     source_name = Column(String(512), default="Unknown Source")
 
+    # Advanced verification fields
+    confidence = Column(String(32), default="High")  # High, Medium, Low
+    match_category = Column(String(64), default="Copied + No Citation")  # Copied + No Citation, Quoted + Cited, Paraphrased + Cited, etc.
+    source_url = Column(String(1024), nullable=True)
+    source_domain = Column(String(255), nullable=True)
+    source_type = Column(String(64), default="Journal")
+    source_reliability = Column(String(32), default="High")  # High, Medium, Low
+    
+    # Human Review system
+    review_decision = Column(String(64), default="Pending Review")  # Pending Review, Confirmed Match, Not Plagiarism, Common Knowledge, Properly Cited, False Positive, Ignored
+    review_notes = Column(Text, nullable=True)
+
     document = relationship("Document", back_populates="matches")
     source = relationship("Source", back_populates="matches")
 
@@ -168,6 +206,98 @@ class Match(Base):
             "is_cited": self.is_cited,
             "is_ignored": self.is_ignored,
             "source_name": self.source_name,
+            "confidence": self.confidence or "High",
+            "match_category": self.match_category or "Copied + No Citation",
+            "source_url": self.source_url,
+            "source_domain": self.source_domain or "",
+            "source_type": self.source_type or "Journal",
+            "source_reliability": self.source_reliability or "High",
+            "review_decision": self.review_decision or "Pending Review",
+            "review_notes": self.review_notes or "",
+        }
+
+
+class Reference(Base):
+    """Structured academic reference entry extracted from the bibliography."""
+    __tablename__ = "references"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False, index=True)
+    ref_number = Column(Integer, nullable=True)
+    raw_text = Column(Text, nullable=False)
+    title = Column(String(512), default="")
+    authors = Column(String(512), default="")
+    journal = Column(String(255), default="")
+    year = Column(Integer, nullable=True)
+    volume = Column(String(64), nullable=True)
+    issue = Column(String(64), nullable=True)
+    pages = Column(String(64), nullable=True)
+    doi = Column(String(255), nullable=True)
+    url = Column(String(1024), nullable=True)
+    publisher = Column(String(255), nullable=True)
+    
+    # Verification status: VERIFIED, PARTIALLY VERIFIED, NOT VERIFIED, SUSPICIOUS, DUPLICATE, BROKEN LINK
+    status = Column(String(64), default="NOT VERIFIED")
+    verification_source = Column(String(255), nullable=True)
+    matched_metadata_json = Column(Text, nullable=True)
+    difference_notes = Column(Text, nullable=True)
+    is_duplicate = Column(Boolean, default=False)
+
+    document = relationship("Document", back_populates="references")
+
+    def to_dict(self):
+        matched = {}
+        if self.matched_metadata_json:
+            try:
+                matched = json.loads(self.matched_metadata_json)
+            except Exception:
+                pass
+        return {
+            "id": self.id,
+            "document_id": self.document_id,
+            "ref_number": self.ref_number,
+            "raw_text": self.raw_text,
+            "title": self.title,
+            "authors": self.authors,
+            "journal": self.journal,
+            "year": self.year,
+            "volume": self.volume,
+            "issue": self.issue,
+            "pages": self.pages,
+            "doi": self.doi,
+            "url": self.url,
+            "publisher": self.publisher,
+            "status": self.status,
+            "verification_source": self.verification_source,
+            "matched_metadata": matched,
+            "difference_notes": self.difference_notes or "",
+            "is_duplicate": self.is_duplicate,
+        }
+
+
+class CitationIssue(Base):
+    """In-text citation audit finding (Missing Reference, Unused Reference, Mismatch, Numbering Error, Broken)."""
+    __tablename__ = "citation_issues"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    document_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False, index=True)
+    issue_type = Column(String(64), nullable=False)
+    citation_text = Column(String(255), nullable=False)
+    page_number = Column(Integer, default=1)
+    details = Column(Text, default="")
+    ref_number = Column(Integer, nullable=True)
+
+    document = relationship("Document", back_populates="citation_issues")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "document_id": self.document_id,
+            "issue_type": self.issue_type,
+            "citation_text": self.citation_text,
+            "page_number": self.page_number,
+            "details": self.details,
+            "ref_number": self.ref_number,
         }
 
 
