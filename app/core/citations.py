@@ -190,3 +190,101 @@ class CitationAnalyzer:
             if not (end_char <= q.start_char or start_char >= q.end_char):
                 return True, q.has_adjacent_citation
         return False, False
+
+    def cross_check_citations_with_references(
+        self,
+        citations: List[CitationMatch],
+        references: list,
+        body_text: str = "",
+    ) -> Tuple[List[CitationIssue], int, int, int]:
+        """Audits in-text citations against extracted bibliography references.
+        Returns: (issues, missing_count, unused_count, mismatch_count)
+        """
+        issues: List[CitationIssue] = []
+        if not references and not citations:
+            return issues, 0, 0, 0
+
+        ref_nums_available = {r.ref_number for r in references if getattr(r, 'ref_number', None) is not None}
+        ref_authors_years = []
+        for r in references:
+            auth_token = r.authors.split(",")[0].split()[0].lower() if getattr(r, 'authors', None) else ""
+            ref_authors_years.append((auth_token, getattr(r, 'year', None), getattr(r, 'ref_number', None), getattr(r, 'title', '')))
+
+        cited_ref_nums = set()
+        cited_authors = set()
+
+        for cit in citations:
+            if cit.citation_type == "IEEE":
+                inner = cit.text.strip("[] \t")
+                parts = re.split(r'[,;]', inner)
+                for p in parts:
+                    p = p.strip()
+                    if "-" in p or "–" in p:
+                        dash = "-" if "-" in p else "–"
+                        subparts = p.split(dash)
+                        if len(subparts) == 2 and subparts[0].strip().isdigit() and subparts[1].strip().isdigit():
+                            start_n, end_n = int(subparts[0].strip()), int(subparts[1].strip())
+                            for n in range(start_n, end_n + 1):
+                                cited_ref_nums.add(n)
+                                if ref_nums_available and n not in ref_nums_available:
+                                    issues.append(CitationIssue(
+                                        issue_type="Missing Reference",
+                                        citation_text=f"[{n}]",
+                                        details=f"In-text citation [{n}] has no matching entry in the reference list.",
+                                        ref_number=n,
+                                    ))
+                    elif p.isdigit():
+                        n = int(p)
+                        cited_ref_nums.add(n)
+                        if ref_nums_available and n not in ref_nums_available:
+                            issues.append(CitationIssue(
+                                issue_type="Missing Reference",
+                                citation_text=f"[{n}]",
+                                details=f"In-text citation [{n}] has no matching entry in the reference list.",
+                                ref_number=n,
+                            ))
+
+            elif cit.citation_type == "Author-Year":
+                m = RE_AUTHOR_YEAR.match(cit.text)
+                if m:
+                    auth_match = m.group(1) or m.group(3)
+                    yr_match = m.group(2) or m.group(4)
+                    first_author = auth_match.split()[0].lower().rstrip(".,") if auth_match else ""
+                    yr_int = int(yr_match) if yr_match and yr_match.isdigit() else None
+                    cited_authors.add(first_author)
+
+                    matched = False
+                    for r_auth, r_yr, r_num, _ in ref_authors_years:
+                        if first_author and r_auth and (first_author in r_auth or r_auth in first_author):
+                            if yr_int is None or r_yr is None or abs(yr_int - r_yr) <= 1:
+                                matched = True
+                                if r_num:
+                                    cited_ref_nums.add(r_num)
+                                break
+                    if not matched and ref_authors_years:
+                        issues.append(CitationIssue(
+                            issue_type="Citation Mismatch",
+                            citation_text=cit.text,
+                            details=f"Author-year citation '{cit.text}' does not match any entry in the bibliography.",
+                        ))
+
+        # Check for unused references
+        for r in references:
+            r_num = getattr(r, 'ref_number', None)
+            if r_num and r_num not in cited_ref_nums:
+                auth_tok = r.authors.split(",")[0].split()[0] if getattr(r, 'authors', None) else ""
+                if len(auth_tok) > 3 and auth_tok.lower() in body_text.lower():
+                    continue
+                r_title = getattr(r, 'title', '')
+                issues.append(CitationIssue(
+                    issue_type="Unused Reference",
+                    citation_text=f"Ref #{r_num}: {r_title[:45]}...",
+                    details="Publication appears in bibliography but is not cited anywhere in document body.",
+                    ref_number=r_num,
+                ))
+
+        missing_count = sum(1 for i in issues if i.issue_type == "Missing Reference")
+        unused_count = sum(1 for i in issues if i.issue_type == "Unused Reference")
+        mismatch_count = sum(1 for i in issues if i.issue_type == "Citation Mismatch")
+
+        return issues, missing_count, unused_count, mismatch_count
