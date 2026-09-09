@@ -72,7 +72,6 @@ QMenu::separator {
     background-color: #273c66;
     border-bottom: 3px solid #21a7d0;
     min-height: 62px;
-    max-height: 62px;
     padding: 0 16px;
 }
 
@@ -90,7 +89,25 @@ QMenu::separator {
     font-weight: 700;
     padding: 4px 10px;
     min-height: 18px;
-    max-height: 20px;
+    min-width: 100px;
+}
+
+#statusPill[state="ready"] {
+    color: #ecfdf5;
+    background-color: #065f46;
+    border: 1px solid #10b981;
+}
+
+#statusPill[state="offline"] {
+    color: #fffbeb;
+    background-color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+#statusPill[state="loading"] {
+    color: #f8fafc;
+    background-color: #475569;
+    border: 1px solid #64748b;
 }
 
 /* ==================== SIDEBAR NAVIGATION ==================== */
@@ -242,14 +259,57 @@ QPushButton.danger:pressed, QPushButton#dangerBtn:pressed {
     background-color: #fecaca;
 }
 
-/* Compact Table Action Button */
-QPushButton.tableBtn, QPushButton#tableBtn {
+/* ==================== COMPACT TABLE BUTTONS ==================== */
+QTableWidget QPushButton, QPushButton.tableBtn, QPushButton#tableBtn {
     min-height: 24px;
-    max-height: 24px;
-    padding: 2px 8px;
+    max-height: 26px;
+    padding: 2px 10px;
     font-size: 11px;
     font-weight: 600;
     border-radius: 4px;
+}
+
+QTableWidget QPushButton#certBtn, QPushButton#certBtn.tableBtn {
+    min-height: 24px;
+    max-height: 26px;
+    padding: 2px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    background-color: #273c66;
+    color: #ffffff;
+    border: 1px solid #1e2f52;
+}
+
+QTableWidget QPushButton#certBtn:hover, QPushButton#certBtn.tableBtn:hover {
+    background-color: #1e2f52;
+    color: #ffffff;
+}
+
+QTableWidget QPushButton#certBtn:pressed, QPushButton#certBtn.tableBtn:pressed {
+    background-color: #112958;
+}
+
+QTableWidget QPushButton#dangerBtn, QPushButton#dangerBtn.tableBtn {
+    min-height: 24px;
+    max-height: 26px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+QTableWidget QPushButton#dangerBtn:hover, QPushButton#dangerBtn.tableBtn:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #b91c1c;
+}
+
+QTableWidget QPushButton#dangerBtn:pressed, QPushButton#dangerBtn.tableBtn:pressed {
+    background-color: #fecaca;
 }
 
 /* ==================== INPUTS & FORM CONTROLS ==================== */
