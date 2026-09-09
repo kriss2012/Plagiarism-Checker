@@ -51,11 +51,25 @@ def _migrate_columns():
             logger.warning(f"Database column migration note: {e}")
 
 
+def _create_indices():
+    """Creates database indices on frequently queried columns to improve filter performance."""
+    with engine.connect() as conn:
+        try:
+            logger.info("Ensuring database indices exist...")
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_documents_student_name ON documents(student_name);"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_documents_prn_number ON documents(prn_number);"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS ix_documents_course_name ON documents(course_name);"))
+            conn.commit()
+        except Exception as e:
+            logger.warning(f"Database index creation note: {e}")
+
+
 def init_db():
     """Initializes database tables, runs column migrations, and seeds default settings."""
     logger.info("Initializing SQLite database tables...")
     Base.metadata.create_all(bind=engine)
     _migrate_columns()
+    _create_indices()
 
     with get_db() as session:
         for key, val in DEFAULT_SETTINGS.items():
