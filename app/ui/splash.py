@@ -32,8 +32,7 @@ from PySide6.QtGui import (
     QBrush,
 )
 from PySide6.QtWidgets import QSplashScreen, QApplication, QWidget, QLabel
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+from app.config import BASE_DIR
 
 
 class AnimatedSplash(QWidget):
@@ -131,53 +130,53 @@ class AnimatedSplash(QWidget):
         ease_out = QEasingCurve.OutCubic
         ease_in  = QEasingCurve.InCubic
 
-        # Phase 1: BG fade-in  (0–450 ms)
+        # Phase 1: BG fade-in  (0–350 ms)
         anim_bg = QPropertyAnimation(self, b"bgOpacity")
-        anim_bg.setDuration(450)
+        anim_bg.setDuration(350)
         anim_bg.setStartValue(0.0)
         anim_bg.setEndValue(1.0)
         anim_bg.setEasingCurve(ease_out)
 
-        # Phase 2: title slides down (300–850 ms)
+        # Phase 2: title slides down (200–600 ms)
         anim_title = QPropertyAnimation(self, b"titleY")
-        anim_title.setDuration(550)
+        anim_title.setDuration(400)
         anim_title.setStartValue(-60.0)
         anim_title.setEndValue(0.0)
         anim_title.setEasingCurve(QEasingCurve.OutBack)
 
-        # Phase 3: subtitle / logo fade-in (700–1100 ms)
+        # Phase 3: subtitle / logo fade-in (400–750 ms)
         anim_content = QPropertyAnimation(self, b"contentOpacity")
-        anim_content.setDuration(450)
+        anim_content.setDuration(350)
         anim_content.setStartValue(0.0)
         anim_content.setEndValue(1.0)
         anim_content.setEasingCurve(ease_out)
 
-        # Phase 4: progress bar fills (1000–3000 ms)
+        # Phase 4: progress bar fills (600–1600 ms)
         anim_progress = QPropertyAnimation(self, b"progress")
-        anim_progress.setDuration(2000)
+        anim_progress.setDuration(1000)
         anim_progress.setStartValue(0.0)
         anim_progress.setEndValue(1.0)
         anim_progress.setEasingCurve(QEasingCurve.InOutSine)
 
-        # Phase 5: fade out (3000–3400 ms)
-        anim_fadeout = QPropertyAnimation(self, b"fadeOut")
-        anim_fadeout.setDuration(400)
-        anim_fadeout.setStartValue(0.0)
-        anim_fadeout.setEndValue(1.0)
+        # Phase 5: smooth windowOpacity fade out (1600–1850 ms)
+        anim_fadeout = QPropertyAnimation(self, b"windowOpacity")
+        anim_fadeout.setDuration(250)
+        anim_fadeout.setStartValue(1.0)
+        anim_fadeout.setEndValue(0.0)
         anim_fadeout.setEasingCurve(ease_in)
         anim_fadeout.finished.connect(self._on_done)
 
-        # Status message cycling timer  (every 420 ms during progress phase)
+        # Status message cycling timer
         self._status_timer = QTimer(self)
-        self._status_timer.setInterval(420)
+        self._status_timer.setInterval(220)
         self._status_timer.timeout.connect(self._advance_status)
 
         # Schedule everything using single-shot timers for precise phasing
         QTimer.singleShot(0,    lambda: anim_bg.start())
-        QTimer.singleShot(300,  lambda: anim_title.start())
-        QTimer.singleShot(700,  lambda: anim_content.start())
-        QTimer.singleShot(1000, lambda: (anim_progress.start(), self._status_timer.start()))
-        QTimer.singleShot(3000, lambda: (self._status_timer.stop(), anim_fadeout.start()))
+        QTimer.singleShot(200,  lambda: anim_title.start())
+        QTimer.singleShot(400,  lambda: anim_content.start())
+        QTimer.singleShot(600,  lambda: (anim_progress.start(), self._status_timer.start()))
+        QTimer.singleShot(1600, lambda: (self._status_timer.stop(), anim_fadeout.start()))
 
         # Keep references alive
         self._animations = [anim_bg, anim_title, anim_content, anim_progress, anim_fadeout]
@@ -187,9 +186,23 @@ class AnimatedSplash(QWidget):
         self._status_text = self._status_messages[self._status_index]
         self.update()
 
+    def mousePressEvent(self, event):
+        """Click to skip splash immediately."""
+        self._on_done()
+
     def _on_done(self):
-        self.finished.emit()
+        if getattr(self, "_is_done", False):
+            return
+        self._is_done = True
+        try:
+            if hasattr(self, "_status_timer") and self._status_timer.isActive():
+                self._status_timer.stop()
+            for a in getattr(self, "_animations", []):
+                a.stop()
+        except Exception:
+            pass
         self.close()
+        self.finished.emit()
 
     # -------------------------------------------------------------------
     # Custom painting
@@ -329,10 +342,5 @@ class AnimatedSplash(QWidget):
         p.setPen(QColor("#7fb8d0"))
         wm_x_ref = w - (self._watermark_pixmap.width() if not self._watermark_pixmap.isNull() else 160) - 18
         p.drawText(wm_x_ref, h - (self._watermark_pixmap.height() if not self._watermark_pixmap.isNull() else 54) - 16, "Developed by")
-
-        # ── White fade-out overlay ────────────────────────────────────
-        if fade_alpha > 0:
-            p.setOpacity(fade_alpha)
-            p.fillRect(0, 0, w, h, QColor("#f3f8f9"))
 
         p.end()
