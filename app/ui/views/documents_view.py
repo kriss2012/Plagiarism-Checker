@@ -289,13 +289,12 @@ class DocumentsView(QWidget):
                 font-size: 11px;
                 font-weight: 700;
                 padding: 3px 8px;
-                min-height: 20px;
-                max-height: 24px;
+                min-height: 22px;
             """)
             badge_box = QWidget()
             badge_box.setStyleSheet("background: transparent;")
             badge_layout = QHBoxLayout(badge_box)
-            badge_layout.setContentsMargins(6, 2, 6, 2)
+            badge_layout.setContentsMargins(4, 2, 4, 2)
             badge_layout.setAlignment(Qt.AlignCenter)
             badge_layout.addWidget(badge)
             self.table.setCellWidget(r_idx, 7, badge_box)
