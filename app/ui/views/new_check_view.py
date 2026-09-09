@@ -533,6 +533,15 @@ class NewCheckView(QWidget):
                 semantic_matches_count=result.score_breakdown.semantic_count,
                 quoted_matches_count=result.score_breakdown.quoted_count,
                 ai_likelihood=getattr(result.ai_writing, "likelihood", "Low"),
+                direct_match_score=result.score_breakdown.direct_match_score,
+                semantic_similarity_score=result.score_breakdown.semantic_similarity_score,
+                citation_coverage_score=result.score_breakdown.citation_coverage_score,
+                reference_verification_score=result.score_breakdown.reference_verification_score,
+                high_risk_similarity=result.score_breakdown.high_risk_similarity,
+                academic_verdict=result.score_breakdown.academic_verdict,
+                references_count=len(getattr(result, "references", [])),
+                verified_references_count=sum(1 for r in getattr(result, "references", []) if r.status in ["VERIFIED", "PARTIALLY VERIFIED"]),
+                citation_issues_count=len(getattr(result.citations, "citation_issues", [])),
                 extracted_text=result.extracted_text,
                 structure_json=json.dumps({
                     k: {"detected": v.detected, "start_char": v.start_char, "end_char": v.end_char}
@@ -542,6 +551,7 @@ class NewCheckView(QWidget):
             session.add(doc)
             session.flush()
 
+            # Save Matches with full verification attributes
             for m in result.matches:
                 match_rec = Match(
                     document_id=doc.id,
@@ -556,8 +566,53 @@ class NewCheckView(QWidget):
                     is_cited=m.get("is_cited", False),
                     is_ignored=m.get("is_ignored", False),
                     source_name=m.get("source_name", "Unknown Source"),
+                    confidence=m.get("confidence", "High"),
+                    match_category=m.get("match_category", "Copied + No Citation"),
+                    source_url=m.get("source_url"),
+                    source_domain=m.get("source_domain", ""),
+                    source_type=m.get("source_type", "Journal"),
+                    source_reliability=m.get("source_reliability", "High"),
+                    review_decision=m.get("review_decision", "Pending Review"),
+                    review_notes=m.get("review_notes", ""),
                 )
                 session.add(match_rec)
+
+            # Save References
+            from app.database.models import CitationIssue, Reference
+            for r in getattr(result, "references", []):
+                ref_rec = Reference(
+                    document_id=doc.id,
+                    ref_number=r.ref_number,
+                    raw_text=r.raw_text,
+                    title=r.title,
+                    authors=r.authors,
+                    journal=r.journal,
+                    year=r.year,
+                    volume=r.volume,
+                    issue=r.issue,
+                    pages=r.pages,
+                    doi=r.doi,
+                    url=r.url,
+                    publisher=r.publisher,
+                    status=r.status,
+                    verification_source=r.verification_source,
+                    matched_metadata_json=json.dumps(r.matched_metadata) if r.matched_metadata else None,
+                    difference_notes=r.difference_notes,
+                    is_duplicate=r.is_duplicate,
+                )
+                session.add(ref_rec)
+
+            # Save Citation Issues
+            for ci in getattr(result.citations, "citation_issues", []):
+                ci_rec = CitationIssue(
+                    document_id=doc.id,
+                    issue_type=ci.issue_type,
+                    citation_text=ci.citation_text,
+                    page_number=ci.page_number,
+                    details=ci.details,
+                    ref_number=ci.ref_number,
+                )
+                session.add(ci_rec)
 
             session.commit()
             return doc.id
