@@ -57,6 +57,7 @@ class ResultsView(QWidget):
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         container = QWidget()
         layout = QVBoxLayout(container)
@@ -70,6 +71,7 @@ class ResultsView(QWidget):
 
         self.title_lbl = QLabel("Student Dissertation Plagiarism Verification & Clearance")
         self.title_lbl.setStyleSheet("font-size: 18px; font-weight: 800; color: #002461;")
+        self.title_lbl.setWordWrap(True)
         
         self.student_bar_lbl = QLabel("Student: - • PRN: - • Program: -")
         self.student_bar_lbl.setStyleSheet("font-size: 11.5px; font-weight: 600; color: #005FEA;")
@@ -83,28 +85,33 @@ class ResultsView(QWidget):
         h_layout.addLayout(v_title, 1)
 
         # Action Buttons
-        self.export_cert_btn = QPushButton("Print Clearance Certificate (PDF)")
+        btn_bar = QHBoxLayout()
+        btn_bar.setSpacing(8)
+
+        self.export_cert_btn = QPushButton("Clearance Certificate (PDF)")
         self.export_cert_btn.setObjectName("certBtn")
         self.export_cert_btn.setFixedHeight(34)
-        self.export_cert_btn.setMinimumWidth(210)
+        self.export_cert_btn.setMinimumWidth(165)
         self.export_cert_btn.setCursor(Qt.PointingHandCursor)
         self.export_cert_btn.clicked.connect(self._export_pdf)
-        h_layout.addWidget(self.export_cert_btn)
+        btn_bar.addWidget(self.export_cert_btn)
 
         self.inspect_btn = QPushButton("Inspect Matches")
         self.inspect_btn.setObjectName("primaryBtn")
         self.inspect_btn.setFixedHeight(34)
-        self.inspect_btn.setMinimumWidth(120)
+        self.inspect_btn.setMinimumWidth(110)
         self.inspect_btn.setCursor(Qt.PointingHandCursor)
         self.inspect_btn.clicked.connect(self._on_inspect_clicked)
-        h_layout.addWidget(self.inspect_btn)
+        btn_bar.addWidget(self.inspect_btn)
 
         self.export_html_btn = QPushButton("HTML Audit Report")
         self.export_html_btn.setFixedHeight(34)
-        self.export_html_btn.setMinimumWidth(140)
+        self.export_html_btn.setMinimumWidth(125)
         self.export_html_btn.setCursor(Qt.PointingHandCursor)
         self.export_html_btn.clicked.connect(self._export_html)
-        h_layout.addWidget(self.export_html_btn)
+        btn_bar.addWidget(self.export_html_btn)
+
+        h_layout.addLayout(btn_bar, 0)
 
         layout.addLayout(h_layout)
 
