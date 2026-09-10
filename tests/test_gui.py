@@ -53,3 +53,12 @@ def test_main_window_instantiation(qapp):
     assert doc_view.table.columnCount() == 9
 
     window.close()
+
+
+def test_similarity_gauge_widget(qapp):
+    from app.ui.widgets.charts import SimilarityGaugeWidget
+    gauge = SimilarityGaugeWidget()
+    gauge.set_value(25.5)
+    assert gauge._value == 25.5
+    gauge.set_score(42.0)
+    assert gauge._value == 42.0
