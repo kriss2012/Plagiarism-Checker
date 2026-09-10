@@ -20,6 +20,10 @@ class SimilarityGaugeWidget(QWidget):
         self._value = max(0.0, min(100.0, float(value)))
         self.update()
 
+    def set_score(self, score: float):
+        """Set similarity score on gauge (alias for set_value)."""
+        self.set_value(score)
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
