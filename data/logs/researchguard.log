@@ -516,3 +516,77 @@ AttributeError: 'SettingsView' object has no attribute 'theme_changed'
 2026-09-09 13:00:35 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
 2026-09-09 13:00:38 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
 2026-09-09 13:00:38 [INFO] (ResearchGuard) Comparing 1 sentences against 0 source sentences.
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Comparing 2 sentences against 1 source sentences.
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:39 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:41 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:41 [INFO] (ResearchGuard) Comparing 1 sentences against 0 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 2 sentences against 2 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 2 sentences against 1 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: test_paper.pdf
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Extracting content from: suspicious_paper.txt (.txt)
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Starting research paper verification for: suspicious_paper.txt
+2026-09-10 08:23:46 [INFO] (ResearchGuard) Comparing 21 sentences against 16 source sentences.
+2026-09-10 08:23:48 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-10 08:23:48 [INFO] (ResearchGuard) Starting research paper verification for: sample_source.txt
+2026-09-10 08:23:48 [INFO] (ResearchGuard) Comparing 22 sentences against 16 source sentences.
+2026-09-10 08:23:48 [INFO] (ResearchGuard) Extracting content from: sample_source.txt (.txt)
+2026-09-10 08:23:48 [INFO] (ResearchGuard) Extracting content from: test_sample.pdf (.pdf)
+2026-09-10 08:23:49 [INFO] (ResearchGuard) Extracting content from: test_sample.docx (.docx)
+2026-09-10 08:23:49 [INFO] (ResearchGuard) Extracting content from: test_unsupported.xyz (.xyz)
+2026-09-10 08:23:49 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-10 08:23:49 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-10 08:23:49 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-10 08:23:50 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-7\test_pdf_report_generation0\test_report.pdf
+2026-09-10 08:23:50 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-7\test_pdf_report_generation0\test_report.pdf
+2026-09-10 08:23:50 [INFO] (ResearchGuard) Generating IMRD Clearance Certificate at: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-7\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) ReportLab successfully built IMRD Certificate: C:\Users\IMRD\AppData\Local\Temp\pytest-of-IMRD\pytest-7\test_imrd_clearance_certificat0\IMRD_Clearance_Certificate.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Comparing 2 sentences against 1 source sentences.
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:51 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:23:53 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:23:53 [INFO] (ResearchGuard) Comparing 1 sentences against 0 source sentences.
+2026-09-10 08:24:55 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-10 08:24:55 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-10 08:24:55 [INFO] (ResearchGuard) Database initialized successfully.
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Comparing 2 sentences against 1 source sentences.
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:25:31 [INFO] (ResearchGuard) Comparing 1 sentences against 1 source sentences.
+2026-09-10 08:25:34 [INFO] (ResearchGuard) Starting research paper verification for: paper.pdf
+2026-09-10 08:25:34 [INFO] (ResearchGuard) Comparing 1 sentences against 0 source sentences.
+2026-09-10 08:25:34 [INFO] (ResearchGuard) Initializing SQLite database tables...
+2026-09-10 08:25:34 [INFO] (ResearchGuard) Ensuring database indices exist...
+2026-09-10 08:25:34 [INFO] (ResearchGuard) Database initialized successfully.
