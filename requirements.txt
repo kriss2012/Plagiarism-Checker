@@ -7,5 +7,5 @@ reportlab>=4.1.0
 sqlalchemy>=2.0.0
 pytest>=8.0.0
 requests>=2.31.0
-pillow>=10.0.0
+pillow>=12.3.0
 pyinstaller>=6.5.0
