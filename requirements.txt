@@ -6,6 +6,6 @@ scikit-learn>=1.4.0
 reportlab>=4.1.0
 sqlalchemy>=2.0.0
 pytest>=8.0.0
-requests>=2.31.0
+requests>=2.34.2
 pillow>=10.0.0
 pyinstaller>=6.5.0
