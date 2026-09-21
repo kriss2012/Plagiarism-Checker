@@ -1,7 +1,7 @@
 PySide6>=6.6.0
 pymupdf>=1.24.0
 python-docx>=1.1.0
-rapidfuzz>=3.8.0
+rapidfuzz>=3.14.6
 scikit-learn>=1.4.0
 reportlab>=4.1.0
 sqlalchemy>=2.0.0
